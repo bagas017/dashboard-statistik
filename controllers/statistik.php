@@ -9,7 +9,8 @@ function generateFilename($ext) {
 
 // Tambah statistik
 if (isset($_POST['tambah'])) {
-    $kategori_id = $_POST['kategori_id'];
+    $kategori_id = $_POST['kategori_id'] ?? null;
+    $submenu_id = $_POST['submenu_id'] ?? null;
     $judul = $_POST['judul'];
     $tipe_grafik = $_POST['tipe_grafik'];
     $sumber_data = $_POST['sumber_data'];
@@ -26,8 +27,8 @@ if (isset($_POST['tambah'])) {
             $file_csv = $filename;
         }
 
-        $stmt = $pdo->prepare("INSERT INTO statistik (kategori_id, judul, tipe_grafik, sumber_data, file_csv) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$kategori_id, $judul, $tipe_grafik, $sumber_data, $file_csv]);
+        $stmt = $pdo->prepare("INSERT INTO statistik (kategori_id, submenu_id, judul, tipe_grafik, sumber_data, file_csv) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$kategori_id ?: null, $submenu_id, $judul, $tipe_grafik, $sumber_data, $file_csv]);
 
         $statistik_id = $pdo->lastInsertId();
 

@@ -32,12 +32,28 @@ $kategori = $stmt->fetchAll();
 <body onload="toggleForm()">
 <h2>Tambah Statistik</h2>
 <form method="POST" action="../../../controllers/statistik.php" enctype="multipart/form-data">
-    <label>Kategori</label><br>
-    <select name="kategori_id" required>
-        <?php foreach ($kategori as $k): ?>
-            <option value="<?= $k['id'] ?>"><?= $k['nama_submenu'] ?> - <?= $k['nama_kategori'] ?></option>
+    <!-- Pilih submenu -->
+    <label>Submenu</label><br>
+    <select name="submenu_id" id="submenuSelect" onchange="loadKategori()" required>
+        <option value="">-- Pilih Submenu --</option>
+        <?php
+        $stmt = $pdo->prepare("SELECT * FROM submenu");
+        $stmt->execute();
+        $submenus = $stmt->fetchAll();
+        foreach ($submenus as $s):
+        ?>
+            <option value="<?= $s['id'] ?>" data-tipe="<?= $s['tipe_tampilan'] ?>"><?= $s['nama_menu'] ?> - <?= $s['nama_submenu'] ?></option>
         <?php endforeach; ?>
     </select><br><br>
+
+    <!-- Pilih kategori jika tersedia -->
+    <div id="kategoriGroup" style="display:none">
+        <label>Kategori</label><br>
+        <select name="kategori_id" id="kategoriSelect">
+            <option value="">-- Pilih Kategori --</option>
+        </select><br><br>
+    </div>
+
 
     <label>Judul Grafik</label><br>
     <input type="text" name="judul" required><br><br>
@@ -70,7 +86,32 @@ $kategori = $stmt->fetchAll();
 </form>
 </body>
 
+
 <script>
+function loadKategori() {
+    const select = document.getElementById('submenuSelect');
+    const selected = select.options[select.selectedIndex];
+    const tipe = selected.getAttribute('data-tipe');
+
+    if (tipe === 'kategori') {
+        document.getElementById('kategoriGroup').style.display = 'block';
+        const submenuId = select.value;
+
+        // Fetch kategori via AJAX
+        fetch('../../../controllers/kategori.php?submenu_id=' + submenuId)
+        .then(res => res.json())
+        .then(data => {
+            const katSelect = document.getElementById('kategoriSelect');
+            katSelect.innerHTML = '';
+            data.forEach(k => {
+                katSelect.innerHTML += `<option value="${k.id}">${k.nama_kategori}</option>`;
+            });
+        });
+    } else {
+        document.getElementById('kategoriGroup').style.display = 'none';
+    }
+}
+
 function toggleForm() {
     const sumber = document.querySelector('input[name="sumber_data"]:checked').value;
     const csvForm = document.getElementById('form_csv');

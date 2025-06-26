@@ -1,6 +1,12 @@
 <?php
 require_once '../config/database.php';
 
+$submenu_id = $_GET['submenu_id'] ?? 0;
+$stmt = $pdo->prepare("SELECT id, nama_kategori FROM kategori WHERE submenu_id = ?");
+$stmt->execute([$submenu_id]);
+echo json_encode($stmt->fetchAll());
+
+
 // Tambah kategori
 if (isset($_POST['tambah'])) {
     $submenu_id = $_POST['submenu_id'];

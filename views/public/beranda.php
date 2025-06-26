@@ -23,6 +23,7 @@ foreach ($submenus as $sm) {
 <html>
 <head>
     <title>Beranda</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .submenu-nav a {
             margin-right: 10px;
@@ -80,7 +81,51 @@ foreach ($submenus as $sm) {
 
     <?php else: ?>
         <!-- Jika submenu langsung menampilkan grafik tanpa kategori -->
-        <p>[Dummy] Grafik langsung tanpa kategori akan tampil di sini.</p>
+        <?php
+        $stmt = $pdo->prepare("SELECT * FROM statistik WHERE submenu_id = ?");
+        $stmt->execute([$current['id']]);
+        $stats = $stmt->fetchAll();
+        ?>
+
+        <?php foreach ($stats as $i => $stat): ?>
+            <h3><?= $stat['judul'] ?></h3>
+            <canvas id="chart<?= $i ?>" width="400" height="200"></canvas>
+
+            <?php
+            $labels = [];
+            $values = [];
+            if ($stat['sumber_data'] === 'manual') {
+                $stmt = $pdo->prepare("SELECT * FROM statistik_data_manual WHERE statistik_id = ?");
+                $stmt->execute([$stat['id']]);
+                $data = $stmt->fetchAll();
+
+                foreach ($data as $row) {
+                    $labels[] = $row['label'];
+                    $values[] = $row['value'];
+                }
+            }
+            ?>
+
+            <script>
+            const ctx<?= $i ?> = document.getElementById('chart<?= $i ?>').getContext('2d');
+            new Chart(ctx<?= $i ?>, {
+                type: '<?= $stat['tipe_grafik'] ?>',
+                data: {
+                    labels: <?= json_encode($labels) ?>,
+                    datasets: [{
+                        label: '<?= addslashes($stat['judul']) ?>',
+                        data: <?= json_encode($values) ?>,
+                        backgroundColor: ['rgba(255, 99, 132, 0.5)', 'rgba(54, 162, 235, 0.5)', 'rgba(255, 206, 86, 0.5)'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+            </script>
+        <?php endforeach; ?>
+
     <?php endif; ?>
 
 <?php else: ?>
