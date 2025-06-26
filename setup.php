@@ -92,6 +92,10 @@ try {
         );
     ");
     
+    // Modifikasi struktur tabel statistik
+    $pdo->exec("ALTER TABLE statistik MODIFY COLUMN kategori_id INT NULL");
+    $pdo->exec("ALTER TABLE statistik ADD COLUMN IF NOT EXISTS submenu_id INT NULL AFTER kategori_id");
+    
     echo "Seluruh tabel berhasil dibuat.";
 
 } catch (PDOException $e) {
