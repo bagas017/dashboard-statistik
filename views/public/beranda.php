@@ -42,6 +42,15 @@ foreach ($submenus as $sm) {
     </style>
 </head>
 <body>
+<a href="../admin/dashboard.php" style="
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background-color: blue;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+">← Admin Dashboard</a>
 
 <h1>Beranda</h1>
 

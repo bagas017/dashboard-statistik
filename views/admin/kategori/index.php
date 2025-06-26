@@ -20,6 +20,16 @@ $data = $stmt->fetchAll();
 <html>
 <head><title>Kelola Kategori</title></head>
 <body>
+<a href="../dashboard.php" style="
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background-color: #6c757d;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+">← Back to Dashboard</a>
+
 <h2>Kategori pada Submenu Beranda</h2>
 <a href="tambah.php">+ Tambah Kategori</a>
 <table border="1">
