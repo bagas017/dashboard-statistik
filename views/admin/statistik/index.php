@@ -22,6 +22,15 @@ $statistik = $stmt->fetchAll();
 <html>
 <head><title>Daftar Statistik</title></head>
 <body>
+<a href="../dashboard.php" style="
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background-color: #6c757d;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+">← Back to Dashboard</a>
 <h2>Data Statistik</h2>
 <a href="tambah.php">+ Tambah Statistik</a>
 <table border="1">

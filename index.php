@@ -41,6 +41,7 @@
         <h1>Welcome to Our Website!</h1>
         <p>Please login to continue.</p>
         <a href="/login.php" class="btn">Go to Login</a>
+        <a href="/views/public/beranda.php" class="btn">View Public</a>
     </div>
 </body>
 </html>
