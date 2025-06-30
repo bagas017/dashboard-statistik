@@ -7,7 +7,6 @@ function generateFilename($ext) {
     return 'stat_' . time() . '_' . rand(100, 999) . '.' . $ext;
 }
 
-// Tambah statistik
 if (isset($_POST['tambah'])) {
     $kategori_id = $_POST['kategori_id'] ?? null;
     $submenu_id = $_POST['submenu_id'] ?? null;
@@ -19,7 +18,8 @@ if (isset($_POST['tambah'])) {
     $pdo->beginTransaction();
 
     try {
-        if ($sumber_data === 'csv' && isset($_FILES['file_csv'])) {
+        // Handle file CSV
+        if ($sumber_data === 'csv' && isset($_FILES['file_csv']) && $_FILES['file_csv']['error'] === 0) {
             $file = $_FILES['file_csv'];
             $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
             $filename = generateFilename($ext);
@@ -27,11 +27,20 @@ if (isset($_POST['tambah'])) {
             $file_csv = $filename;
         }
 
+        // Simpan data utama statistik
         $stmt = $pdo->prepare("INSERT INTO statistik (kategori_id, submenu_id, judul, tipe_grafik, sumber_data, file_csv) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$kategori_id ?: null, $submenu_id, $judul, $tipe_grafik, $sumber_data, $file_csv]);
+        $stmt->execute([
+            $kategori_id ?: null,
+            $submenu_id,
+            $judul,
+            $tipe_grafik,
+            $sumber_data,
+            $file_csv
+        ]);
 
         $statistik_id = $pdo->lastInsertId();
 
+        // Simpan data manual jika dipilih
         if ($sumber_data === 'manual' && isset($_POST['label'], $_POST['value'])) {
             $labels = $_POST['label'];
             $values = $_POST['value'];
@@ -54,4 +63,3 @@ if (isset($_POST['tambah'])) {
         echo "Error: " . $e->getMessage();
     }
 }
-?>

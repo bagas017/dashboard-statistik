@@ -32,6 +32,7 @@ $statistik_list = $stmt->fetchAll();
         $labels = [];
         $values = [];
 
+        // Grafik Versi Manual Input
         if ($stat['sumber_data'] === 'manual') {
             $stmt = $pdo->prepare("SELECT * FROM statistik_data_manual WHERE statistik_id = ?");
             $stmt->execute([$stat['id']]);
@@ -41,10 +42,24 @@ $statistik_list = $stmt->fetchAll();
                 $labels[] = $row['label'];
                 $values[] = $row['value'];
             }
-        }
 
-        // Jika nanti versi CSV ingin ditampilkan, tambahkan pembacaan CSV di sini
+            // Grafik Versi CSV Input
+        } elseif ($stat['sumber_data'] === 'csv' && $stat['file_csv']) {
+            $csv_path = "../../uploads/csv/" . $stat['file_csv'];
+            if (file_exists($csv_path)) {
+                if (($handle = fopen($csv_path, "r")) !== false) {
+                    $first = true;
+                    while (($data = fgetcsv($handle, 1000, ",")) !== false) {
+                        if ($first) { $first = false; continue; } // skip header
+                        $labels[] = $data[0];
+                        $values[] = floatval($data[1]);
+                    }
+                    fclose($handle);
+                }
+            }
+        }
         ?>
+
 
         <script>
         const ctx<?= $i ?> = document.getElementById('chart<?= $i ?>').getContext('2d');

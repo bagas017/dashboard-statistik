@@ -6,10 +6,6 @@ if (!isset($_SESSION['admin_id'])) {
     header("Location: ../../login.php");
     exit;
 }
-
-$stmt = $pdo->prepare("SELECT kategori.*, submenu.nama_submenu FROM kategori INNER JOIN submenu ON kategori.submenu_id = submenu.id");
-$stmt->execute();
-$kategori = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
 <html>
@@ -18,14 +14,46 @@ $kategori = $stmt->fetchAll();
     <script>
     function toggleForm() {
         const sumber = document.querySelector('input[name="sumber_data"]:checked').value;
-        document.getElementById('form_csv').style.display = sumber === 'csv' ? 'block' : 'none';
-        document.getElementById('form_manual').style.display = sumber === 'manual' ? 'block' : 'none';
+        const csvForm = document.getElementById('form_csv');
+        const manualForm = document.getElementById('form_manual');
+        const fileInput = document.getElementById('file_csv');
+
+        csvForm.style.display = sumber === 'csv' ? 'block' : 'none';
+        manualForm.style.display = sumber === 'manual' ? 'block' : 'none';
+
+        const manualInputs = manualForm.querySelectorAll('input');
+        manualInputs.forEach(input => input.disabled = sumber !== 'manual');
+        fileInput.disabled = sumber !== 'csv';
     }
+
     function tambahBaris() {
         const container = document.getElementById('manual_container');
         const div = document.createElement('div');
-        div.innerHTML = '<input name="label[]" placeholder="Label" required> <input name="value[]" type="number" step="any" placeholder="Value" required> <br>';
+        div.innerHTML = '<input name="label[]" placeholder="Label"> <input name="value[]" type="number" step="any" placeholder="Value"><br>';
         container.appendChild(div);
+    }
+
+    function loadKategori() {
+        const select = document.getElementById('submenuSelect');
+        const selected = select.options[select.selectedIndex];
+        const tipe = selected.getAttribute('data-tipe');
+
+        if (tipe === 'kategori') {
+            document.getElementById('kategoriGroup').style.display = 'block';
+            const submenuId = select.value;
+
+            fetch('../../../controllers/kategori.php?submenu_id=' + submenuId)
+            .then(res => res.json())
+            .then(data => {
+                const katSelect = document.getElementById('kategoriSelect');
+                katSelect.innerHTML = '';
+                data.forEach(k => {
+                    katSelect.innerHTML += `<option value="${k.id}">${k.nama_kategori}</option>`;
+                });
+            });
+        } else {
+            document.getElementById('kategoriGroup').style.display = 'none';
+        }
     }
     </script>
 </head>
@@ -46,14 +74,13 @@ $kategori = $stmt->fetchAll();
         <?php endforeach; ?>
     </select><br><br>
 
-    <!-- Pilih kategori jika tersedia -->
+    <!-- Pilih kategori jika submenu bertipe kategori -->
     <div id="kategoriGroup" style="display:none">
         <label>Kategori</label><br>
         <select name="kategori_id" id="kategoriSelect">
             <option value="">-- Pilih Kategori --</option>
         </select><br><br>
     </div>
-
 
     <label>Judul Grafik</label><br>
     <input type="text" name="judul" required><br><br>
@@ -77,7 +104,10 @@ $kategori = $stmt->fetchAll();
     <div id="form_manual" style="display:none">
         <label>Input Manual</label><br>
         <div id="manual_container">
-            <div><input name="label[]" placeholder="Label" required> <input name="value[]" type="number" step="any" placeholder="Value" required></div>
+            <div>
+                <input name="label[]" placeholder="Label">
+                <input name="value[]" type="number" step="any" placeholder="Value">
+            </div>
         </div>
         <button type="button" onclick="tambahBaris()">+ Tambah Baris</button><br>
     </div><br>
@@ -85,50 +115,4 @@ $kategori = $stmt->fetchAll();
     <button type="submit" name="tambah">Simpan Statistik</button>
 </form>
 </body>
-
-
-<script>
-function loadKategori() {
-    const select = document.getElementById('submenuSelect');
-    const selected = select.options[select.selectedIndex];
-    const tipe = selected.getAttribute('data-tipe');
-
-    if (tipe === 'kategori') {
-        document.getElementById('kategoriGroup').style.display = 'block';
-        const submenuId = select.value;
-
-        // Fetch kategori via AJAX
-        fetch('../../../controllers/kategori.php?submenu_id=' + submenuId)
-        .then(res => res.json())
-        .then(data => {
-            const katSelect = document.getElementById('kategoriSelect');
-            katSelect.innerHTML = '';
-            data.forEach(k => {
-                katSelect.innerHTML += `<option value="${k.id}">${k.nama_kategori}</option>`;
-            });
-        });
-    } else {
-        document.getElementById('kategoriGroup').style.display = 'none';
-    }
-}
-
-function toggleForm() {
-    const sumber = document.querySelector('input[name="sumber_data"]:checked').value;
-    const csvForm = document.getElementById('form_csv');
-    const manualForm = document.getElementById('form_manual');
-    const fileInput = document.getElementById('file_csv');
-
-    csvForm.style.display = sumber === 'csv' ? 'block' : 'none';
-    manualForm.style.display = sumber === 'manual' ? 'block' : 'none';
-
-    // toggle required
-    if (sumber === 'csv') {
-        fileInput.setAttribute('required', true);
-    } else {
-        fileInput.removeAttribute('required');
-    }
-}
-</script>
-
 </html>
-
