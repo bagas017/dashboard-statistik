@@ -6,10 +6,9 @@ $stmt = $pdo->prepare("SELECT * FROM submenu WHERE nama_menu = 'beranda'");
 $stmt->execute();
 $submenus = $stmt->fetchAll();
 
-// Ambil slug submenu yang dipilih dari URL (default ke submenu pertama jika tidak ada)
 $slug = $_GET['submenu'] ?? ($submenus[0]['slug'] ?? null);
 
-// Temukan submenu yang aktif berdasarkan slug
+// Temukan submenu yang aktif
 $current = null;
 foreach ($submenus as $sm) {
     if ($sm['slug'] === $slug) {
@@ -18,12 +17,11 @@ foreach ($submenus as $sm) {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>Beranda</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
     <style>
         .submenu-nav a {
             margin-right: 10px;
@@ -66,19 +64,15 @@ foreach ($submenus as $sm) {
 
 <hr>
 
-<!-- Tampilan Konten Berdasarkan Submenu yang Dipilih -->
 <?php if ($current): ?>
     <h2><?= htmlspecialchars($current['nama_submenu']) ?></h2>
 
     <?php if ($current['tipe_tampilan'] === 'kategori'): ?>
         <?php
-        // Ambil kategori berdasarkan submenu yang aktif
         $stmt = $pdo->prepare("SELECT * FROM kategori WHERE submenu_id = ?");
         $stmt->execute([$current['id']]);
         $kategoris = $stmt->fetchAll();
         ?>
-
-        <!-- Tampilkan kategori dalam grid -->
         <div style="display: flex; flex-wrap: wrap; gap: 10px;">
             <?php foreach ($kategoris as $kat): ?>
                 <div class="kategori-box">
@@ -89,7 +83,6 @@ foreach ($submenus as $sm) {
         </div>
 
     <?php else: ?>
-        <!-- Jika submenu langsung menampilkan grafik tanpa kategori -->
         <?php
         $stmt = $pdo->prepare("SELECT * FROM statistik WHERE submenu_id = ?");
         $stmt->execute([$current['id']]);
@@ -98,66 +91,68 @@ foreach ($submenus as $sm) {
 
         <?php foreach ($stats as $i => $stat): ?>
             <h3><?= $stat['judul'] ?></h3>
-            <canvas id="chart<?= $i ?>" width="400" height="200"></canvas>
+            <div id="chart<?= $i ?>" style="width:100%; height:400px;"></div>
 
             <?php
             $labels = [];
             $values = [];
+            $data_points = [];
 
-            // Grafik Versi Manual Input
             if ($stat['sumber_data'] === 'manual') {
                 $stmt = $pdo->prepare("SELECT * FROM statistik_data_manual WHERE statistik_id = ?");
                 $stmt->execute([$stat['id']]);
                 $data = $stmt->fetchAll();
-
                 foreach ($data as $row) {
                     $labels[] = $row['label'];
-                    $values[] = $row['value'];
+                    $values[] = (float)$row['value'];
+                    $data_points[] = ['name' => $row['label'], 'y' => (float)$row['value']];
                 }
-
-                // Grafik Versi CSV Input
             } elseif ($stat['sumber_data'] === 'csv' && $stat['file_csv']) {
                 $csv_path = "../../uploads/csv/" . $stat['file_csv'];
                 if (file_exists($csv_path)) {
                     if (($handle = fopen($csv_path, "r")) !== false) {
                         $first = true;
-                        while (($data = fgetcsv($handle, 1000, ",")) !== false) {
-                            if ($first) { $first = false; continue; } // skip header
-                            $labels[] = $data[0];
-                            $values[] = floatval($data[1]);
+                        while (($row = fgetcsv($handle, 1000, ",")) !== false) {
+                            if ($first) { $first = false; continue; }
+                            $labels[] = $row[0];
+                            $values[] = (float)$row[1];
+                            $data_points[] = ['name' => $row[0], 'y' => (float)$row[1]];
                         }
                         fclose($handle);
                     }
                 }
             }
+
+            $chartType = $stat['tipe_grafik'] === 'bar' ? 'column' : $stat['tipe_grafik'];
+            $isPie = $stat['tipe_grafik'] === 'pie';
             ?>
-
-
             <script>
-            const ctx<?= $i ?> = document.getElementById('chart<?= $i ?>').getContext('2d');
-            new Chart(ctx<?= $i ?>, {
-                type: '<?= $stat['tipe_grafik'] ?>',
-                data: {
-                    labels: <?= json_encode($labels) ?>,
-                    datasets: [{
-                        label: '<?= addslashes($stat['judul']) ?>',
-                        data: <?= json_encode($values) ?>,
-                        backgroundColor: ['rgba(255, 99, 132, 0.5)', 'rgba(54, 162, 235, 0.5)', 'rgba(255, 206, 86, 0.5)'],
-                        borderWidth: 1
-                    }]
+            Highcharts.chart('chart<?= $i ?>', {
+                chart: { type: '<?= $chartType ?>' },
+                title: { text: '<?= addslashes($stat['judul']) ?>' }
+                <?php if (!$isPie): ?>,
+                xAxis: { categories: <?= json_encode($labels) ?> },
+                yAxis: { title: { text: 'Nilai' }}
+                <?php endif; ?>,
+                plotOptions: {
+                    pie: {
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.y}'
+                        }
+                    }
                 },
-                options: {
-                    responsive: true
-                }
+                series: [{
+                    name: '<?= addslashes($stat['judul']) ?>',
+                    colorByPoint: <?= $isPie ? 'true' : 'false' ?>,
+                    data: <?= json_encode($isPie ? $data_points : $values) ?>
+                }]
             });
             </script>
         <?php endforeach; ?>
-
     <?php endif; ?>
-
 <?php else: ?>
     <p>Tidak ada submenu yang ditemukan.</p>
 <?php endif; ?>
-
 </body>
 </html>
