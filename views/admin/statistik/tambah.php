@@ -14,25 +14,97 @@ if (!isset($_SESSION['admin_id'])) {
     <script>
     function toggleForm() {
         const sumber = document.querySelector('input[name="sumber_data"]:checked').value;
+        const tipe = document.querySelector('select[name="tipe_grafik"]').value;
+
+        // tampil/sembunyikan form CSV/manual
         const csvForm = document.getElementById('form_csv');
         const manualForm = document.getElementById('form_manual');
         const fileInput = document.getElementById('file_csv');
-
         csvForm.style.display = sumber === 'csv' ? 'block' : 'none';
         manualForm.style.display = sumber === 'manual' ? 'block' : 'none';
-
-        const manualInputs = manualForm.querySelectorAll('input');
-        manualInputs.forEach(input => input.disabled = sumber !== 'manual');
         fileInput.disabled = sumber !== 'csv';
+
+        // tampilkan form input manual berdasarkan tipe grafik
+        const forPie = document.getElementById('manual_for_pie');
+        const forOthers = document.getElementById('manual_for_others');
+
+        forPie.style.display = tipe === 'pie' ? 'block' : 'none';
+        forOthers.style.display = tipe !== 'pie' ? 'block' : 'none';
+
+        // hilangkan atribut required dari semua input manual
+        document.querySelectorAll('#form_manual input').forEach(input => {
+            input.removeAttribute('required');
+        });
+
+        // hanya aktifkan required untuk input yang tampil
+        if (sumber === 'manual') {
+            if (tipe === 'pie') {
+                document.querySelectorAll('#manual_for_pie input').forEach(input => {
+                    input.setAttribute('required', 'required');
+                });
+            } else {
+                document.querySelectorAll('#manual_for_others input').forEach(input => {
+                    input.setAttribute('required', 'required');
+                });
+            }
+        }
+
+        // jika sumber csv, pastikan input file required
+        if (sumber === 'csv') {
+            fileInput.setAttribute('required', 'required');
+        } else {
+            fileInput.removeAttribute('required');
+        }
     }
 
-    function tambahBaris() {
-        const container = document.getElementById('manual_container');
+
+    // Tambah baris data untuk series Bar/Line
+    function tambahBaris(seriesIndex) {
+        const container = document.getElementById('series_' + seriesIndex + '_rows');
         const div = document.createElement('div');
-        div.innerHTML = '<input name="label[]" placeholder="Label"> <input name="value[]" type="number" step="any" placeholder="Value"><br>';
+        div.innerHTML = `
+            <input name="series_label[${seriesIndex}][]" placeholder="Label" required>
+            <input name="series_value[${seriesIndex}][]" type="number" step="any" placeholder="Value" required>
+            <button type="button" onclick="this.parentElement.remove()">Hapus Baris</button>
+        `;
         container.appendChild(div);
     }
 
+    // Tambah baris data untuk Pie chart
+    function tambahBarisPie() {
+        const container = document.getElementById('manual_container');
+        const div = document.createElement('div');
+        div.innerHTML = `
+            <input name="label[]" placeholder="Label" required>
+            <input name="value[]" type="number" step="any" placeholder="Value" required>
+            <button type="button" onclick="this.parentElement.remove()">Hapus Baris</button>
+        `;
+        container.appendChild(div);
+    }
+
+    // Tambah satu series baru untuk Bar/Line chart
+    function tambahSeries() {
+        const container = document.getElementById('multi_series_container');
+        const index = document.querySelectorAll('.series-box').length;
+        const div = document.createElement('div');
+        div.className = 'series-box'; // bisa diganti dengan class CSS nanti
+        div.innerHTML = `
+            <strong>Series ${index + 1}</strong>
+            <button type="button" onclick="this.parentElement.remove()">Hapus Series</button><br>
+            <input name="series_name[]" placeholder="Nama Series" required><br><br>
+            <div id="series_${index}_rows">
+                <div>
+                    <input name="series_label[${index}][]" placeholder="Label" required>
+                    <input name="series_value[${index}][]" type="number" step="any" placeholder="Value" required>
+                    <button type="button" onclick="this.parentElement.remove()">Hapus Baris</button>
+                </div>
+            </div>
+            <button type="button" onclick="tambahBaris(${index})">+ Tambah Baris</button>
+        `;
+        container.appendChild(div);
+    }
+
+    // Load kategori berdasarkan submenu yang dipilih
     function loadKategori() {
         const select = document.getElementById('submenuSelect');
         const selected = select.options[select.selectedIndex];
@@ -59,7 +131,9 @@ if (!isset($_SESSION['admin_id'])) {
 </head>
 <body onload="toggleForm()">
 <h2>Tambah Statistik</h2>
+
 <form method="POST" action="../../../controllers/statistik.php" enctype="multipart/form-data">
+
     <!-- Pilih submenu -->
     <label>Submenu</label><br>
     <select name="submenu_id" id="submenuSelect" onchange="loadKategori()" required>
@@ -74,7 +148,7 @@ if (!isset($_SESSION['admin_id'])) {
         <?php endforeach; ?>
     </select><br><br>
 
-    <!-- Pilih kategori jika submenu bertipe kategori -->
+    <!-- Kategori (jika diperlukan) -->
     <div id="kategoriGroup" style="display:none">
         <label>Kategori</label><br>
         <select name="kategori_id" id="kategoriSelect">
@@ -82,36 +156,55 @@ if (!isset($_SESSION['admin_id'])) {
         </select><br><br>
     </div>
 
+    <!-- Judul Grafik -->
     <label>Judul Grafik</label><br>
     <input type="text" name="judul" required><br><br>
 
+    <!-- Tipe Grafik -->
     <label>Tipe Grafik</label><br>
-    <select name="tipe_grafik" required>
+    <select name="tipe_grafik" onchange="toggleForm()" required>
         <option value="bar">Bar</option>
         <option value="line">Line</option>
         <option value="pie">Pie</option>
     </select><br><br>
 
+    <!-- Sumber Data -->
     <label>Sumber Data:</label><br>
     <input type="radio" name="sumber_data" value="csv" checked onclick="toggleForm()"> CSV
     <input type="radio" name="sumber_data" value="manual" onclick="toggleForm()"> Manual<br><br>
 
+    <!-- Form Upload CSV -->
     <div id="form_csv">
-        <label>Upload File CSV (Label,Value)</label><br>
+        <label>Upload File CSV</label><br>
         <input type="file" name="file_csv" accept=".csv" id="file_csv"><br>
     </div>
 
+    <!-- Form Input Manual -->
     <div id="form_manual" style="display:none">
-        <label>Input Manual</label><br>
-        <div id="manual_container">
-            <div>
-                <input name="label[]" placeholder="Label">
-                <input name="value[]" type="number" step="any" placeholder="Value">
+
+        <!-- Untuk Pie Chart -->
+        <div id="manual_for_pie">
+            <label>Input Data (Label - Value)</label><br>
+            <div id="manual_container">
+                <div>
+                    <input name="label[]" placeholder="Label" required>
+                    <input name="value[]" type="number" step="any" placeholder="Value" required>
+                    <button type="button" onclick="this.parentElement.remove()">Hapus Baris</button>
+                </div>
             </div>
+            <button type="button" onclick="tambahBarisPie()">+ Tambah Baris</button>
         </div>
-        <button type="button" onclick="tambahBaris()">+ Tambah Baris</button><br>
+
+        <!-- Untuk Bar/Line Multi Series -->
+        <div id="manual_for_others" style="display:none">
+            <label>Input Multi-Series</label><br>
+            <div id="multi_series_container"></div>
+            <button type="button" onclick="tambahSeries()">+ Tambah Series</button>
+        </div>
+
     </div><br>
 
+    <!-- Tombol Submit -->
     <button type="submit" name="tambah">Simpan Statistik</button>
 </form>
 </body>

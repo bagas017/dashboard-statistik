@@ -43,10 +43,32 @@ $statistik_list = $stmt->fetchAll();
                 ];
             }
         } else {
+            // Ambil semua series unik
+            $seriesNames = [];
+            $labelMap = [];
+
             foreach ($data as $row) {
-                $categories[] = $row['label'];
-                $series[0]['name'] = 'Data';
-                $series[0]['data'][] = (float) $row['value'];
+                $seriesNames[$row['series_label']] = true;
+                $labelMap[$row['label']] = true;
+            }
+
+            $categories = array_keys($labelMap);
+            $seriesNames = array_keys($seriesNames);
+
+            foreach ($seriesNames as $seriesName) {
+                $seriesData = [];
+                foreach ($categories as $label) {
+                    $found = false;
+                    foreach ($data as $row) {
+                        if ($row['series_label'] === $seriesName && $row['label'] === $label) {
+                            $seriesData[] = (float) $row['value'];
+                            $found = true;
+                            break;
+                        }
+                    }
+                    if (!$found) $seriesData[] = null;
+                }
+                $series[] = ['name' => $seriesName, 'data' => $seriesData];
             }
         }
 
@@ -56,7 +78,6 @@ $statistik_list = $stmt->fetchAll();
             if (($handle = fopen($csv_path, "r")) !== false) {
                 $headers = fgetcsv($handle, 1000, ",");
                 if ($chartType === 'pie') {
-                    // Pie chart hanya bisa pakai 2 kolom
                     while (($row = fgetcsv($handle, 1000, ",")) !== false) {
                         $series[] = [
                             'name' => $row[0],
@@ -64,7 +85,6 @@ $statistik_list = $stmt->fetchAll();
                         ];
                     }
                 } else {
-                    // Bar/Line chart support multiple series
                     $seriesNames = array_slice($headers, 1);
                     $seriesData = [];
                     foreach ($seriesNames as $name) {
@@ -92,9 +112,15 @@ $statistik_list = $stmt->fetchAll();
         title: { text: '<?= addslashes($stat['judul']) ?>' }
         <?php if ($chartType !== 'pie'): ?>,
         xAxis: { categories: <?= json_encode($categories) ?> },
-        yAxis: { title: { text: 'Nilai' }}
+        yAxis: { title: { text: 'Nilai' } },
+        series: <?= json_encode($series) ?>
+        <?php else: ?>,
+        series: [{
+            name: 'Data',
+            colorByPoint: true,
+            data: <?= json_encode($series) ?>
+        }]
         <?php endif; ?>,
-        series: <?= json_encode($chartType === 'pie' ? [['name' => 'Data', 'colorByPoint' => true, 'data' => $series]] : $series) ?>
     });
     </script>
 <?php endforeach; ?>

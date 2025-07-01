@@ -96,6 +96,9 @@ try {
     $pdo->exec("ALTER TABLE statistik MODIFY COLUMN kategori_id INT NULL");
     $pdo->exec("ALTER TABLE statistik ADD COLUMN IF NOT EXISTS submenu_id INT NULL AFTER kategori_id");
     
+    // Tambahkan kolom series_label ke tabel statistik_data_manual
+    $pdo->exec("ALTER TABLE statistik_data_manual ADD COLUMN series_label VARCHAR(255) DEFAULT NULL");
+    
     echo "Seluruh tabel berhasil dibuat.";
 
 } catch (PDOException $e) {

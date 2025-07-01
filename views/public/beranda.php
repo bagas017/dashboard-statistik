@@ -6,10 +6,10 @@ $stmt = $pdo->prepare("SELECT * FROM submenu WHERE nama_menu = 'beranda'");
 $stmt->execute();
 $submenus = $stmt->fetchAll();
 
-// Ambil slug submenu yang dipilih dari URL (default ke submenu pertama jika tidak ada)
+// Ambil slug submenu yang dipilih dari URL
 $slug = $_GET['submenu'] ?? ($submenus[0]['slug'] ?? null);
 
-// Temukan submenu yang aktif berdasarkan slug
+// Temukan submenu yang aktif
 $current = null;
 foreach ($submenus as $sm) {
     if ($sm['slug'] === $slug) {
@@ -65,7 +65,6 @@ foreach ($submenus as $sm) {
 
 <hr>
 
-<!-- Tampilan Konten Berdasarkan Submenu yang Dipilih -->
 <?php if ($current): ?>
     <h2><?= htmlspecialchars($current['nama_submenu']) ?></h2>
 
@@ -114,10 +113,31 @@ foreach ($submenus as $sm) {
                         ];
                     }
                 } else {
+                    $seriesNames = [];
+                    $labelMap = [];
+
                     foreach ($data as $row) {
-                        $categories[] = $row['label'];
-                        $series[0]['name'] = 'Data';
-                        $series[0]['data'][] = (float) $row['value'];
+                        $seriesNames[$row['series_label']] = true;
+                        $labelMap[$row['label']] = true;
+                    }
+
+                    $categories = array_keys($labelMap);
+                    $seriesNames = array_keys($seriesNames);
+
+                    foreach ($seriesNames as $seriesName) {
+                        $seriesData = [];
+                        foreach ($categories as $label) {
+                            $found = false;
+                            foreach ($data as $row) {
+                                if ($row['series_label'] === $seriesName && $row['label'] === $label) {
+                                    $seriesData[] = (float) $row['value'];
+                                    $found = true;
+                                    break;
+                                }
+                            }
+                            if (!$found) $seriesData[] = null;
+                        }
+                        $series[] = ['name' => $seriesName, 'data' => $seriesData];
                     }
                 }
 
@@ -126,8 +146,8 @@ foreach ($submenus as $sm) {
                 if (file_exists($csv_path)) {
                     if (($handle = fopen($csv_path, "r")) !== false) {
                         $headers = fgetcsv($handle, 1000, ",");
+
                         if ($chartType === 'pie') {
-                            // Pie chart: hanya support 2 kolom (label, value)
                             while (($row = fgetcsv($handle, 1000, ",")) !== false) {
                                 $series[] = [
                                     'name' => $row[0],
@@ -135,22 +155,24 @@ foreach ($submenus as $sm) {
                                 ];
                             }
                         } else {
-                            // Bar/Line chart support multiple series
                             $seriesNames = array_slice($headers, 1);
                             $seriesData = [];
                             foreach ($seriesNames as $name) {
                                 $seriesData[$name] = [];
                             }
+
                             while (($row = fgetcsv($handle, 1000, ",")) !== false) {
                                 $categories[] = $row[0];
                                 for ($j = 1; $j < count($row); $j++) {
                                     $seriesData[$seriesNames[$j - 1]][] = floatval($row[$j]);
                                 }
                             }
+
                             foreach ($seriesData as $name => $data) {
                                 $series[] = ['name' => $name, 'data' => $data];
                             }
                         }
+
                         fclose($handle);
                     }
                 }
@@ -163,7 +185,7 @@ foreach ($submenus as $sm) {
                 title: { text: '<?= addslashes($stat['judul']) ?>' }
                 <?php if ($chartType !== 'pie'): ?>,
                 xAxis: { categories: <?= json_encode($categories) ?> },
-                yAxis: { title: { text: 'Nilai' }},
+                yAxis: { title: { text: 'Nilai' } },
                 series: <?= json_encode($series) ?>
                 <?php else: ?>,
                 series: [{

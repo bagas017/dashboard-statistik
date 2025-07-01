@@ -18,8 +18,8 @@ if (isset($_POST['tambah'])) {
     $pdo->beginTransaction();
 
     try {
-        // Handle file CSV
-        if ($sumber_data === 'csv' && isset($_FILES['file_csv']) && $_FILES['file_csv']['error'] === 0) {
+        // Upload CSV jika dipilih
+        if ($sumber_data === 'csv' && isset($_FILES['file_csv'])) {
             $file = $_FILES['file_csv'];
             $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
             $filename = generateFilename($ext);
@@ -27,7 +27,7 @@ if (isset($_POST['tambah'])) {
             $file_csv = $filename;
         }
 
-        // Simpan data utama statistik
+        // Simpan ke tabel utama
         $stmt = $pdo->prepare("INSERT INTO statistik (kategori_id, submenu_id, judul, tipe_grafik, sumber_data, file_csv) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $kategori_id ?: null,
@@ -40,16 +40,38 @@ if (isset($_POST['tambah'])) {
 
         $statistik_id = $pdo->lastInsertId();
 
-        // Simpan data manual jika dipilih
-        if ($sumber_data === 'manual' && isset($_POST['label'], $_POST['value'])) {
-            $labels = $_POST['label'];
-            $values = $_POST['value'];
+        // Handle input manual
+        if ($sumber_data === 'manual') {
+            // PIE: label[] dan value[]
+            if ($tipe_grafik === 'pie' && isset($_POST['label'], $_POST['value'])) {
+                $labels = $_POST['label'];
+                $values = $_POST['value'];
 
-            if (count($labels) === count($values)) {
-                $stmt = $pdo->prepare("INSERT INTO statistik_data_manual (statistik_id, label, value) VALUES (?, ?, ?)");
+                $stmt = $pdo->prepare("INSERT INTO statistik_data_manual (statistik_id, label, series_label, value) VALUES (?, ?, ?, ?)");
                 foreach ($labels as $i => $label) {
-                    if (trim($label) !== '' && is_numeric($values[$i])) {
-                        $stmt->execute([$statistik_id, $label, $values[$i]]);
+                    $value = $values[$i];
+                    if (trim($label) !== '' && is_numeric($value)) {
+                        $stmt->execute([$statistik_id, (string)$label, null, $value]);
+                    }
+                }
+
+            // BAR / LINE: multi-series
+            } elseif (($tipe_grafik === 'bar' || $tipe_grafik === 'line') && isset($_POST['series_name'], $_POST['series_label'], $_POST['series_value'])) {
+                $series_names = $_POST['series_name']; // [series_0, series_1, ...]
+                $series_labels = $_POST['series_label']; // array: [0 => [label1, label2], 1 => [...]]
+                $series_values = $_POST['series_value']; // array: [0 => [val1, val2], 1 => [...]]
+                
+                $stmt = $pdo->prepare("INSERT INTO statistik_data_manual (statistik_id, label, series_label, value) VALUES (?, ?, ?, ?)");
+
+                foreach ($series_names as $series_index => $series_name) {
+                    $labels = $series_labels[$series_index];
+                    $values = $series_values[$series_index];
+
+                    foreach ($labels as $i => $label) {
+                        $value = $values[$i];
+                        if (trim($label) !== '' && is_numeric($value)) {
+                            $stmt->execute([$statistik_id, $label, $series_name, $value]);
+                        }
                     }
                 }
             }
@@ -58,6 +80,7 @@ if (isset($_POST['tambah'])) {
         $pdo->commit();
         header("Location: ../views/admin/statistik/index.php");
         exit;
+
     } catch (Exception $e) {
         $pdo->rollBack();
         echo "Error: " . $e->getMessage();
