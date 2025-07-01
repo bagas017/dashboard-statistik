@@ -27,11 +27,10 @@ if (!isset($_SESSION['admin_id'])) {
         // tampilkan form input manual berdasarkan tipe grafik
         const forPie = document.getElementById('manual_for_pie');
         const forOthers = document.getElementById('manual_for_others');
-
         forPie.style.display = tipe === 'pie' ? 'block' : 'none';
         forOthers.style.display = tipe !== 'pie' ? 'block' : 'none';
 
-        // hilangkan atribut required dari semua input manual
+        // reset semua input manual agar tidak required
         document.querySelectorAll('#form_manual input').forEach(input => {
             input.removeAttribute('required');
         });
@@ -49,7 +48,7 @@ if (!isset($_SESSION['admin_id'])) {
             }
         }
 
-        // jika sumber csv, pastikan input file required
+        // jika sumber csv, pastikan file input required
         if (sumber === 'csv') {
             fileInput.setAttribute('required', 'required');
         } else {
@@ -57,8 +56,6 @@ if (!isset($_SESSION['admin_id'])) {
         }
     }
 
-
-    // Tambah baris data untuk series Bar/Line
     function tambahBaris(seriesIndex) {
         const container = document.getElementById('series_' + seriesIndex + '_rows');
         const div = document.createElement('div');
@@ -70,7 +67,6 @@ if (!isset($_SESSION['admin_id'])) {
         container.appendChild(div);
     }
 
-    // Tambah baris data untuk Pie chart
     function tambahBarisPie() {
         const container = document.getElementById('manual_container');
         const div = document.createElement('div');
@@ -82,12 +78,11 @@ if (!isset($_SESSION['admin_id'])) {
         container.appendChild(div);
     }
 
-    // Tambah satu series baru untuk Bar/Line chart
     function tambahSeries() {
         const container = document.getElementById('multi_series_container');
         const index = document.querySelectorAll('.series-box').length;
         const div = document.createElement('div');
-        div.className = 'series-box'; // bisa diganti dengan class CSS nanti
+        div.className = 'series-box';
         div.innerHTML = `
             <strong>Series ${index + 1}</strong>
             <button type="button" onclick="this.parentElement.remove()">Hapus Series</button><br>
@@ -104,7 +99,6 @@ if (!isset($_SESSION['admin_id'])) {
         container.appendChild(div);
     }
 
-    // Load kategori berdasarkan submenu yang dipilih
     function loadKategori() {
         const select = document.getElementById('submenuSelect');
         const selected = select.options[select.selectedIndex];
@@ -127,6 +121,26 @@ if (!isset($_SESSION['admin_id'])) {
             document.getElementById('kategoriGroup').style.display = 'none';
         }
     }
+
+    // VALIDASI: Cek label tidak boleh hanya angka
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelector("form").addEventListener("submit", function(e) {
+            const labels = [
+                ...document.querySelectorAll('input[name="label[]"]'),
+                ...document.querySelectorAll('input[name^="series_label"]')
+            ];
+
+            for (const input of labels) {
+                const value = input.value.trim();
+                if (/^\d+$/.test(value)) {
+                    alert("Label tidak boleh hanya angka. Misalnya: gunakan 'Tahun 2020' bukan '" + value + "' saja.");
+                    input.focus();
+                    e.preventDefault();
+                    return;
+                }
+            }
+        });
+    });
     </script>
 </head>
 <body onload="toggleForm()">
@@ -148,7 +162,7 @@ if (!isset($_SESSION['admin_id'])) {
         <?php endforeach; ?>
     </select><br><br>
 
-    <!-- Kategori (jika diperlukan) -->
+    <!-- Kategori -->
     <div id="kategoriGroup" style="display:none">
         <label>Kategori</label><br>
         <select name="kategori_id" id="kategoriSelect">
@@ -182,7 +196,7 @@ if (!isset($_SESSION['admin_id'])) {
     <!-- Form Input Manual -->
     <div id="form_manual" style="display:none">
 
-        <!-- Untuk Pie Chart -->
+        <!-- Input Pie Chart -->
         <div id="manual_for_pie">
             <label>Input Data (Label - Value)</label><br>
             <div id="manual_container">
@@ -195,7 +209,7 @@ if (!isset($_SESSION['admin_id'])) {
             <button type="button" onclick="tambahBarisPie()">+ Tambah Baris</button>
         </div>
 
-        <!-- Untuk Bar/Line Multi Series -->
+        <!-- Input Multi-Series (Bar/Line) -->
         <div id="manual_for_others" style="display:none">
             <label>Input Multi-Series</label><br>
             <div id="multi_series_container"></div>
