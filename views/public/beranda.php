@@ -49,7 +49,8 @@ foreach ($submenus as $sm) {
     background-color: blue;
     color: white;
     text-decoration: none;
-    border-radius: 5px;">← Admin Dashboard</a>
+    border-radius: 5px;
+">← Admin Dashboard</a>
 
 <h1>Beranda</h1>
 
@@ -92,10 +93,11 @@ foreach ($submenus as $sm) {
         ?>
 
         <?php foreach ($stats as $i => $stat): ?>
-            <h3><?= $stat['judul'] ?></h3>
+            <h3><?= htmlspecialchars($stat['judul']) ?></h3>
             <div id="chart<?= $i ?>" style="width:100%; height:400px;"></div>
 
             <?php
+            $chartType = $stat['tipe_grafik'] === 'bar' ? 'column' : $stat['tipe_grafik'];
             $categories = [];
             $series = [];
 
@@ -104,46 +106,72 @@ foreach ($submenus as $sm) {
                 $stmt->execute([$stat['id']]);
                 $data = $stmt->fetchAll();
 
-                foreach ($data as $row) {
-                    $categories[] = $row['label'];
-                    $series[0]['name'] = 'Data';
-                    $series[0]['data'][] = (float) $row['value'];
+                if ($chartType === 'pie') {
+                    foreach ($data as $row) {
+                        $series[] = [
+                            'name' => $row['label'],
+                            'y' => (float) $row['value']
+                        ];
+                    }
+                } else {
+                    foreach ($data as $row) {
+                        $categories[] = $row['label'];
+                        $series[0]['name'] = 'Data';
+                        $series[0]['data'][] = (float) $row['value'];
+                    }
                 }
+
             } elseif ($stat['sumber_data'] === 'csv' && $stat['file_csv']) {
                 $csv_path = "../../uploads/csv/" . $stat['file_csv'];
                 if (file_exists($csv_path)) {
                     if (($handle = fopen($csv_path, "r")) !== false) {
                         $headers = fgetcsv($handle, 1000, ",");
-                        $seriesNames = array_slice($headers, 1);
-                        $seriesData = [];
-                        foreach ($seriesNames as $name) {
-                            $seriesData[$name] = [];
-                        }
-                        while (($row = fgetcsv($handle, 1000, ",")) !== false) {
-                            $categories[] = $row[0];
-                            for ($j = 1; $j < count($row); $j++) {
-                                $seriesData[$seriesNames[$j - 1]][] = floatval($row[$j]);
+                        if ($chartType === 'pie') {
+                            // Pie chart: hanya support 2 kolom (label, value)
+                            while (($row = fgetcsv($handle, 1000, ",")) !== false) {
+                                $series[] = [
+                                    'name' => $row[0],
+                                    'y' => (float) $row[1]
+                                ];
+                            }
+                        } else {
+                            // Bar/Line chart support multiple series
+                            $seriesNames = array_slice($headers, 1);
+                            $seriesData = [];
+                            foreach ($seriesNames as $name) {
+                                $seriesData[$name] = [];
+                            }
+                            while (($row = fgetcsv($handle, 1000, ",")) !== false) {
+                                $categories[] = $row[0];
+                                for ($j = 1; $j < count($row); $j++) {
+                                    $seriesData[$seriesNames[$j - 1]][] = floatval($row[$j]);
+                                }
+                            }
+                            foreach ($seriesData as $name => $data) {
+                                $series[] = ['name' => $name, 'data' => $data];
                             }
                         }
                         fclose($handle);
-
-                        foreach ($seriesData as $name => $data) {
-                            $series[] = ['name' => $name, 'data' => $data];
-                        }
                     }
                 }
             }
-
-            $chartType = $stat['tipe_grafik'] === 'bar' ? 'column' : $stat['tipe_grafik'];
             ?>
 
             <script>
             Highcharts.chart('chart<?= $i ?>', {
                 chart: { type: '<?= $chartType ?>' },
-                title: { text: '<?= addslashes($stat['judul']) ?>' },
+                title: { text: '<?= addslashes($stat['judul']) ?>' }
+                <?php if ($chartType !== 'pie'): ?>,
                 xAxis: { categories: <?= json_encode($categories) ?> },
                 yAxis: { title: { text: 'Nilai' }},
                 series: <?= json_encode($series) ?>
+                <?php else: ?>,
+                series: [{
+                    name: 'Data',
+                    colorByPoint: true,
+                    data: <?= json_encode($series) ?>
+                }]
+                <?php endif; ?>,
             });
             </script>
         <?php endforeach; ?>
