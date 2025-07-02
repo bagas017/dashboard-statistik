@@ -10,6 +10,7 @@ $kategori = $stmt->fetch();
 $stmt = $pdo->prepare("SELECT * FROM statistik WHERE kategori_id = ?");
 $stmt->execute([$id_kategori]);
 $statistik_list = $stmt->fetchAll();
+$judulList = array_unique(array_map(fn($s) => $s['judul'], $statistik_list));
 ?>
 
 <!DOCTYPE html>
@@ -18,33 +19,22 @@ $statistik_list = $stmt->fetchAll();
     <title>Statistik Kategori - <?= htmlspecialchars($kategori['nama_kategori']) ?></title>
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <style>
-        table {
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        table, th, td {
-            border: 1px solid #888;
-        }
-        th, td {
-            padding: 5px 10px;
-            text-align: center;
-        }
-        .statistik-container {
-            display: none;
-            margin-top: 20px;
-        }
+        table { border-collapse: collapse; margin-top: 10px; }
+        table, th, td { border: 1px solid #888; }
+        th, td { padding: 5px 10px; text-align: center; }
+        .statistik-container { display: none; margin-top: 20px; }
     </style>
 </head>
 <body>
 <h2><?= htmlspecialchars($kategori['nama_submenu']) ?> / <?= htmlspecialchars($kategori['nama_kategori']) ?></h2>
 
 <?php if (count($statistik_list) > 0): ?>
-    <!-- Dropdown Statistik -->
     <label for="statistikSelector"><strong>Pilih Judul Statistik:</strong></label>
     <select id="statistikSelector">
-        <?php foreach ($statistik_list as $i => $stat): ?>
-            <option value="statistik<?= $i ?>" <?= $i === 0 ? 'selected' : '' ?>>
-                <?= htmlspecialchars($stat['judul']) ?>
+        <option value="">-- Pilih Statistik --</option>
+        <?php foreach ($judulList as $i => $judul): ?>
+            <option value="<?= htmlspecialchars($judul) ?>" <?= $i === 0 ? 'selected' : '' ?>>
+                <?= htmlspecialchars($judul) ?>
             </option>
         <?php endforeach; ?>
     </select>
@@ -121,12 +111,11 @@ $statistik_list = $stmt->fetchAll();
         }
         ?>
 
-        <div class="statistik-container" id="<?= $containerId ?>" style="<?= $i === 0 ? 'display:block;' : 'display:none;' ?>">
+        <div class="statistik-container" id="<?= $containerId ?>" data-judul="<?= htmlspecialchars($stat['judul']) ?>" style="<?= $i === 0 ? 'display:block;' : 'display:none;' ?>">
             <h3><?= htmlspecialchars($stat['judul']) ?></h3>
             <div id="<?= $chartId ?>" style="width:100%; height:400px;"></div>
             <h4><?= nl2br(htmlspecialchars($stat['deskripsi'] ?? '')) ?></h4>
 
-            <!-- TABEL DATA -->
             <h4>Data Tabel</h4>
             <table>
                 <thead>
@@ -179,30 +168,22 @@ $statistik_list = $stmt->fetchAll();
         </script>
     <?php endforeach; ?>
 
-    <!-- Script JS untuk interaksi dropdown -->
     <script>
     document.getElementById('statistikSelector').addEventListener('change', function () {
         let selected = this.value;
         document.querySelectorAll('.statistik-container').forEach(div => {
-            div.style.display = 'none';
+            div.style.display = (div.dataset.judul === selected) ? 'block' : 'none';
         });
-        if (selected) {
-            document.getElementById(selected).style.display = 'block';
-        }
     });
 
     document.addEventListener("DOMContentLoaded", function () {
         const selector = document.getElementById('statistikSelector');
         const selected = selector.value;
         document.querySelectorAll('.statistik-container').forEach(div => {
-            div.style.display = 'none';
+            div.style.display = (div.dataset.judul === selected) ? 'block' : 'none';
         });
-        if (selected) {
-            document.getElementById(selected).style.display = 'block';
-        }
     });
     </script>
-
 <?php else: ?>
     <p><em>Tidak ada data statistik yang tersedia untuk kategori ini.</em></p>
 <?php endif; ?>

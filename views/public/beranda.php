@@ -107,13 +107,16 @@ foreach ($submenus as $sm) {
         ?>
 
         <?php if (count($stats) > 0): ?>
-            <!-- Dropdown Statistik -->
+            <?php
+            $judulList = array_unique(array_map(fn($s) => $s['judul'], $stats));
+            ?>
+            <!-- Dropdown Selector -->
             <label for="statistikSelector"><strong>Pilih Judul Statistik:</strong></label>
             <select id="statistikSelector">
                 <option value="">-- Pilih Statistik --</option>
-                <?php foreach ($stats as $i => $stat): ?>
-                    <option value="statistik<?= $i ?>" <?= $i === 0 ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($stat['judul']) ?>
+                <?php foreach ($judulList as $i => $judul): ?>
+                    <option value="<?= htmlspecialchars($judul) ?>" <?= $i === 0 ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($judul) ?>
                     </option>
                 <?php endforeach; ?>
             </select>
@@ -190,7 +193,7 @@ foreach ($submenus as $sm) {
                 }
                 ?>
 
-                <div class="statistik-container" id="<?= $containerId ?>" style="<?= $i === 0 ? 'display:block;' : 'display:none;' ?>">
+                <div class="statistik-container" id="<?= $containerId ?>" data-judul="<?= htmlspecialchars($stat['judul']) ?>" style="<?= $i === 0 ? 'display:block;' : 'display:none;' ?>">
                     <h3><?= htmlspecialchars($stat['judul']) ?></h3>
                     <div id="<?= $chartId ?>" style="width:100%; height:400px;"></div>
                     <h4><?= nl2br(htmlspecialchars($stat['deskripsi'] ?? '')) ?></h4>
@@ -254,24 +257,18 @@ foreach ($submenus as $sm) {
 
             <script>
             document.getElementById('statistikSelector').addEventListener('change', function () {
-                let selected = this.value;
+                let selectedJudul = this.value;
                 document.querySelectorAll('.statistik-container').forEach(div => {
-                    div.style.display = 'none';
+                    div.style.display = (div.dataset.judul === selectedJudul) ? 'block' : 'none';
                 });
-                if (selected) {
-                    document.getElementById(selected).style.display = 'block';
-                }
             });
 
             document.addEventListener("DOMContentLoaded", function () {
                 const selector = document.getElementById('statistikSelector');
                 const selected = selector.value;
                 document.querySelectorAll('.statistik-container').forEach(div => {
-                    div.style.display = 'none';
+                    div.style.display = (div.dataset.judul === selected) ? 'block' : 'none';
                 });
-                if (selected) {
-                    document.getElementById(selected).style.display = 'block';
-                }
             });
             </script>
         <?php else: ?>

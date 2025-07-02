@@ -85,9 +85,9 @@ try {
         CREATE TABLE IF NOT EXISTS agenda (
             id INT AUTO_INCREMENT PRIMARY KEY,
             nama_agenda VARCHAR(150),
-            deskripsi TEXT,
-            tanggal_mulai DATE,
-            tanggal_selesai DATE,
+            tanggal DATE,
+            jam_mulai TIME,
+            jam_selesai TIME,
             lokasi VARCHAR(100)
         );
     ");
