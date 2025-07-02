@@ -1,15 +1,12 @@
 <?php
 require_once '../../config/database.php';
 
-// Ambil semua submenu dari menu 'beranda'
 $stmt = $pdo->prepare("SELECT * FROM submenu WHERE nama_menu = 'beranda'");
 $stmt->execute();
 $submenus = $stmt->fetchAll();
 
-// Ambil slug submenu yang dipilih dari URL
 $slug = $_GET['submenu'] ?? ($submenus[0]['slug'] ?? null);
 
-// Temukan submenu yang aktif
 $current = null;
 foreach ($submenus as $sm) {
     if ($sm['slug'] === $slug) {
@@ -39,6 +36,17 @@ foreach ($submenus as $sm) {
             margin-bottom: 10px;
             width: 200px;
         }
+        table {
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table, th, td {
+            border: 1px solid #888;
+        }
+        th, td {
+            padding: 5px 10px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -54,7 +62,6 @@ foreach ($submenus as $sm) {
 
 <h1>Beranda</h1>
 
-<!-- Navigasi Submenu -->
 <div class="submenu-nav">
     <?php foreach ($submenus as $sm): ?>
         <a href="?submenu=<?= $sm['slug'] ?>" class="<?= ($sm['slug'] === $slug ? 'active' : '') ?>">
@@ -94,6 +101,7 @@ foreach ($submenus as $sm) {
         <?php foreach ($stats as $i => $stat): ?>
             <h3><?= htmlspecialchars($stat['judul']) ?></h3>
             <div id="chart<?= $i ?>" style="width:100%; height:400px;"></div>
+            <h4><?= nl2br(htmlspecialchars($stat['deskripsi'] ?? '')) ?></h4>
 
             <?php
             $chartType = $stat['tipe_grafik'] === 'bar' ? 'column' : $stat['tipe_grafik'];
@@ -107,23 +115,17 @@ foreach ($submenus as $sm) {
 
                 if ($chartType === 'pie') {
                     foreach ($data as $row) {
-                        $series[] = [
-                            'name' => $row['label'],
-                            'y' => (float) $row['value']
-                        ];
+                        $series[] = ['name' => $row['label'], 'y' => (float) $row['value']];
                     }
                 } else {
                     $seriesNames = [];
                     $labelMap = [];
-
                     foreach ($data as $row) {
                         $seriesNames[$row['series_label']] = true;
                         $labelMap[$row['label']] = true;
                     }
-
                     $categories = array_keys($labelMap);
                     $seriesNames = array_keys($seriesNames);
-
                     foreach ($seriesNames as $seriesName) {
                         $seriesData = [];
                         foreach ($categories as $label) {
@@ -146,33 +148,24 @@ foreach ($submenus as $sm) {
                 if (file_exists($csv_path)) {
                     if (($handle = fopen($csv_path, "r")) !== false) {
                         $headers = fgetcsv($handle, 1000, ",");
-
                         if ($chartType === 'pie') {
                             while (($row = fgetcsv($handle, 1000, ",")) !== false) {
-                                $series[] = [
-                                    'name' => $row[0],
-                                    'y' => (float) $row[1]
-                                ];
+                                $series[] = ['name' => $row[0], 'y' => (float) $row[1]];
                             }
                         } else {
                             $seriesNames = array_slice($headers, 1);
                             $seriesData = [];
-                            foreach ($seriesNames as $name) {
-                                $seriesData[$name] = [];
-                            }
-
+                            foreach ($seriesNames as $name) $seriesData[$name] = [];
                             while (($row = fgetcsv($handle, 1000, ",")) !== false) {
                                 $categories[] = $row[0];
                                 for ($j = 1; $j < count($row); $j++) {
                                     $seriesData[$seriesNames[$j - 1]][] = floatval($row[$j]);
                                 }
                             }
-
                             foreach ($seriesData as $name => $data) {
                                 $series[] = ['name' => $name, 'data' => $data];
                             }
                         }
-
                         fclose($handle);
                     }
                 }
@@ -196,12 +189,49 @@ foreach ($submenus as $sm) {
                 <?php endif; ?>,
             });
             </script>
+
+            <!-- TABEL DATA -->
+            <h4>Data Tabel</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <?php if ($chartType === 'pie'): ?>
+                            <th>Label</th>
+                            <th>Value</th>
+                        <?php else: ?>
+                            <th>Kategori</th>
+                            <?php foreach ($series as $s): ?>
+                                <th><?= htmlspecialchars($s['name']) ?></th>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if ($chartType === 'pie'): ?>
+                        <?php foreach ($series as $row): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($row['name']) ?></td>
+                                <td><?= $row['y'] ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <?php foreach ($categories as $rowIndex => $cat): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($cat) ?></td>
+                                <?php foreach ($series as $s): ?>
+                                    <td><?= $s['data'][$rowIndex] ?? '' ?></td>
+                                <?php endforeach; ?>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+
+            <br><br>
         <?php endforeach; ?>
     <?php endif; ?>
-
 <?php else: ?>
     <p>Tidak ada submenu yang ditemukan.</p>
 <?php endif; ?>
-
 </body>
 </html>

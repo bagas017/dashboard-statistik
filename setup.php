@@ -94,10 +94,24 @@ try {
     
     // Modifikasi struktur tabel statistik
     $pdo->exec("ALTER TABLE statistik MODIFY COLUMN kategori_id INT NULL");
-    $pdo->exec("ALTER TABLE statistik ADD COLUMN IF NOT EXISTS submenu_id INT NULL AFTER kategori_id");
     
-    // Tambahkan kolom series_label ke tabel statistik_data_manual
-    $pdo->exec("ALTER TABLE statistik_data_manual ADD COLUMN series_label VARCHAR(255) DEFAULT NULL");
+    // Tambahkan submenu_id jika belum ada
+    $stmt = $pdo->query("SHOW COLUMNS FROM statistik LIKE 'submenu_id'");
+    if ($stmt->rowCount() == 0) {
+        $pdo->exec("ALTER TABLE statistik ADD COLUMN submenu_id INT NULL AFTER kategori_id");
+    }
+    
+    // Tambahkan series_label jika belum ada
+    $stmt = $pdo->query("SHOW COLUMNS FROM statistik_data_manual LIKE 'series_label'");
+    if ($stmt->rowCount() == 0) {
+        $pdo->exec("ALTER TABLE statistik_data_manual ADD COLUMN series_label VARCHAR(255) DEFAULT NULL");
+    }
+    
+    // Tambahkan deskripsi jika belum ada
+    $stmt = $pdo->query("SHOW COLUMNS FROM statistik LIKE 'deskripsi'");
+    if ($stmt->rowCount() == 0) {
+        $pdo->exec("ALTER TABLE statistik ADD COLUMN deskripsi TEXT DEFAULT NULL");
+    }
     
     echo "Seluruh tabel berhasil dibuat.";
 

@@ -148,7 +148,6 @@ if (!isset($_SESSION['admin_id'])) {
 
 <form method="POST" action="../../../controllers/statistik.php" enctype="multipart/form-data">
 
-    <!-- Pilih submenu -->
     <label>Submenu</label><br>
     <select name="submenu_id" id="submenuSelect" onchange="loadKategori()" required>
         <option value="">-- Pilih Submenu --</option>
@@ -162,7 +161,6 @@ if (!isset($_SESSION['admin_id'])) {
         <?php endforeach; ?>
     </select><br><br>
 
-    <!-- Kategori -->
     <div id="kategoriGroup" style="display:none">
         <label>Kategori</label><br>
         <select name="kategori_id" id="kategoriSelect">
@@ -170,11 +168,12 @@ if (!isset($_SESSION['admin_id'])) {
         </select><br><br>
     </div>
 
-    <!-- Judul Grafik -->
     <label>Judul Grafik</label><br>
     <input type="text" name="judul" required><br><br>
 
-    <!-- Tipe Grafik -->
+    <label>Deskripsi</label><br>
+    <textarea name="deskripsi" rows="4" cols="50" placeholder="Tambahkan deskripsi grafik..." required></textarea><br><br>
+
     <label>Tipe Grafik</label><br>
     <select name="tipe_grafik" onchange="toggleForm()" required>
         <option value="bar">Bar</option>
@@ -182,43 +181,29 @@ if (!isset($_SESSION['admin_id'])) {
         <option value="pie">Pie</option>
     </select><br><br>
 
-    <!-- Sumber Data -->
     <label>Sumber Data:</label><br>
     <input type="radio" name="sumber_data" value="csv" checked onclick="toggleForm()"> CSV
     <input type="radio" name="sumber_data" value="manual" onclick="toggleForm()"> Manual<br><br>
 
-    <!-- Form Upload CSV -->
     <div id="form_csv">
         <label>Upload File CSV</label><br>
         <input type="file" name="file_csv" accept=".csv" id="file_csv"><br>
     </div>
 
-    <!-- Form Input Manual -->
     <div id="form_manual" style="display:none">
-
-        <!-- Input Pie Chart -->
         <div id="manual_for_pie">
             <label>Input Data (Label - Value)</label><br>
-            <div id="manual_container">
-                <div>
-                    <input name="label[]" placeholder="Label" required>
-                    <input name="value[]" type="number" step="any" placeholder="Value" required>
-                    <button type="button" onclick="this.parentElement.remove()">Hapus Baris</button>
-                </div>
-            </div>
+            <div id="manual_container"></div>
             <button type="button" onclick="tambahBarisPie()">+ Tambah Baris</button>
         </div>
 
-        <!-- Input Multi-Series (Bar/Line) -->
         <div id="manual_for_others" style="display:none">
             <label>Input Multi-Series</label><br>
             <div id="multi_series_container"></div>
             <button type="button" onclick="tambahSeries()">+ Tambah Series</button>
         </div>
-
     </div><br>
 
-    <!-- Tombol Submit -->
     <button type="submit" name="tambah">Simpan Statistik</button>
 </form>
 </body>
