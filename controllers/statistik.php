@@ -11,6 +11,7 @@ if (isset($_POST['tambah'])) {
     $kategori_id = $_POST['kategori_id'] ?? null;
     $submenu_id = $_POST['submenu_id'] ?? null;
     $judul = $_POST['judul'];
+    $deskripsi = $_POST['deskripsi'] ?? null;
     $tipe_grafik = $_POST['tipe_grafik'];
     $sumber_data = $_POST['sumber_data'];
     $file_csv = null;
@@ -28,11 +29,15 @@ if (isset($_POST['tambah'])) {
         }
 
         // Simpan ke tabel utama
-        $stmt = $pdo->prepare("INSERT INTO statistik (kategori_id, submenu_id, judul, tipe_grafik, sumber_data, file_csv) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("
+            INSERT INTO statistik (kategori_id, submenu_id, judul, deskripsi, tipe_grafik, sumber_data, file_csv) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ");
         $stmt->execute([
             $kategori_id ?: null,
             $submenu_id,
             $judul,
+            $deskripsi,
             $tipe_grafik,
             $sumber_data,
             $file_csv
@@ -42,12 +47,16 @@ if (isset($_POST['tambah'])) {
 
         // Handle input manual
         if ($sumber_data === 'manual') {
+
             // PIE: label[] dan value[]
             if ($tipe_grafik === 'pie' && isset($_POST['label'], $_POST['value'])) {
                 $labels = $_POST['label'];
                 $values = $_POST['value'];
 
-                $stmt = $pdo->prepare("INSERT INTO statistik_data_manual (statistik_id, label, series_label, value) VALUES (?, ?, ?, ?)");
+                $stmt = $pdo->prepare("
+                    INSERT INTO statistik_data_manual (statistik_id, label, series_label, value) 
+                    VALUES (?, ?, ?, ?)
+                ");
                 foreach ($labels as $i => $label) {
                     $value = $values[$i];
                     if (trim($label) !== '' && is_numeric($value)) {
@@ -55,13 +64,19 @@ if (isset($_POST['tambah'])) {
                     }
                 }
 
-            // BAR / LINE: multi-series
-            } elseif (($tipe_grafik === 'bar' || $tipe_grafik === 'line') && isset($_POST['series_name'], $_POST['series_label'], $_POST['series_value'])) {
+            // BAR / LINE: multi-series input
+            } elseif (
+                ($tipe_grafik === 'bar' || $tipe_grafik === 'line') &&
+                isset($_POST['series_name'], $_POST['series_label'], $_POST['series_value'])
+            ) {
                 $series_names = $_POST['series_name']; // [series_0, series_1, ...]
                 $series_labels = $_POST['series_label']; // array: [0 => [label1, label2], 1 => [...]]
                 $series_values = $_POST['series_value']; // array: [0 => [val1, val2], 1 => [...]]
-                
-                $stmt = $pdo->prepare("INSERT INTO statistik_data_manual (statistik_id, label, series_label, value) VALUES (?, ?, ?, ?)");
+
+                $stmt = $pdo->prepare("
+                    INSERT INTO statistik_data_manual (statistik_id, label, series_label, value) 
+                    VALUES (?, ?, ?, ?)
+                ");
 
                 foreach ($series_names as $series_index => $series_name) {
                     $labels = $series_labels[$series_index];
