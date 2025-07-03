@@ -113,6 +113,17 @@ try {
         $pdo->exec("ALTER TABLE statistik ADD COLUMN deskripsi TEXT DEFAULT NULL");
     }
     
+    // Tambahkan deskripsi dan gambar ke tabel kategori
+    $stmt = $pdo->query("SHOW COLUMNS FROM kategori LIKE 'deskripsi'");
+    if ($stmt->rowCount() == 0) {
+        $pdo->exec("ALTER TABLE kategori ADD COLUMN deskripsi TEXT");
+    }
+    
+    $stmt = $pdo->query("SHOW COLUMNS FROM kategori LIKE 'gambar'");
+    if ($stmt->rowCount() == 0) {
+        $pdo->exec("ALTER TABLE kategori ADD COLUMN gambar VARCHAR(255)");
+    }
+    
     echo "Seluruh tabel berhasil dibuat.";
 
 } catch (PDOException $e) {

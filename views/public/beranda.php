@@ -90,8 +90,12 @@ foreach ($submenus as $sm) {
             <div style="display: flex; flex-wrap: wrap; gap: 10px;">
                 <?php foreach ($kategoris as $kat): ?>
                     <div class="kategori-box">
-                        <strong><?= htmlspecialchars($kat['nama_kategori']) ?></strong><br>
-                        <a href="kategori.php?id=<?= $kat['id'] ?>">Lihat Grafik</a>
+                        <?php if (!empty($kat['gambar'])): ?>
+                            <img src="../../assets/kategori/<?= htmlspecialchars($kat['gambar']) ?>" alt="Gambar <?= htmlspecialchars($kat['nama_kategori']) ?>" style="width: 100%; height: 120px; object-fit: cover; border-radius: 5px;">
+                        <?php endif; ?>
+                        <h3><?= htmlspecialchars($kat['nama_kategori']) ?></h3>
+                        <p style="font-size: 0.9em; color: #555;"><?= htmlspecialchars($kat['deskripsi']) ?></p>
+                        <a href="kategori.php?id=<?= $kat['id'] ?>" style="display:inline-block; margin-top:5px; padding:6px 10px; background:#007bff; color:white; text-decoration:none; border-radius:4px;">Lihat Grafik</a>
                     </div>
                 <?php endforeach; ?>
             </div>
