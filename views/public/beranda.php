@@ -15,6 +15,9 @@ foreach ($submenus as $sm) {
     }
 }
 ?>
+
+<?php include 'partials/header.php'; ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -23,6 +26,12 @@ foreach ($submenus as $sm) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         .submenu-nav a {
             margin-right: 10px;
             text-decoration: none;
@@ -53,22 +62,24 @@ foreach ($submenus as $sm) {
             display: none;
             margin-top: 20px;
         }
+
+        .content-wrapper {
+            min-height: 80vh;
+            max-height: 80vh;
+            padding: 20px;
+            background-color: #f9f9f9;
+            overflow-y: auto;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            overflow-x: scroll;
+        }
     </style>
 </head>
 <body>
 
-<a href="../admin/dashboard.php" style="
-    display: inline-block;
-    margin-bottom: 20px;
-    padding: 10px 15px;
-    background-color: #6c757d;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-">← Back to Dashboard</a>
-
-<h1>Beranda</h1>
-
+<div class="content-wrapper">
 <?php if ($current): ?>
     <h2><?= htmlspecialchars($current['nama_submenu']) ?></h2>
 
@@ -107,7 +118,6 @@ foreach ($submenus as $sm) {
             <?php
             $judulList = array_unique(array_map(fn($s) => $s['judul'], $stats));
             ?>
-            <!-- Dropdown Selector -->
             <label for="statistikSelector"><strong>Pilih Judul Statistik:</strong></label>
             <select id="statistikSelector">
                 <option value="">-- Pilih Statistik --</option>
@@ -160,7 +170,6 @@ foreach ($submenus as $sm) {
                             $series[] = ['name' => $seriesName, 'data' => $seriesData];
                         }
                     }
-
                 } elseif ($stat['sumber_data'] === 'csv' && $stat['file_csv']) {
                     $csv_path = "../../uploads/csv/" . $stat['file_csv'];
                     if (file_exists($csv_path)) {
@@ -195,7 +204,6 @@ foreach ($submenus as $sm) {
                     <div id="<?= $chartId ?>" style="width:100%; height:400px;"></div>
                     <h4><?= nl2br(htmlspecialchars($stat['deskripsi'] ?? '')) ?></h4>
 
-                    <!-- TABEL DATA -->
                     <h4>Data Tabel</h4>
                     <table>
                         <thead>
@@ -275,6 +283,7 @@ foreach ($submenus as $sm) {
 <?php else: ?>
     <p>Tidak ada submenu yang ditemukan.</p>
 <?php endif; ?>
+</div>
 
 <hr>
 

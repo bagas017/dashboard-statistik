@@ -1,47 +1,133 @@
 <?php
-require_once '../../../config/database.php';
+session_start();
+require_once '../../../controllers/agenda.php';
 
-// Ambil semua agenda, urutkan dari yang terbaru
-$stmt = $pdo->query("SELECT * FROM agenda ORDER BY tanggal DESC");
-$agendas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-function formatAgenda($tanggal, $mulai, $selesai) {
-    // Format: 23 Juni 2025, 13.00 - 14.00 WIB
-    $bulan = [
-        '01' => 'Januari', '02' => 'Februari', '03' => 'Maret', '04' => 'April',
-        '05' => 'Mei', '06' => 'Juni', '07' => 'Juli', '08' => 'Agustus',
-        '09' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
-    ];
-    $pecah = explode('-', $tanggal);
-    $tglFormatted = ltrim($pecah[2], '0') . ' ' . $bulan[$pecah[1]] . ' ' . $pecah[0];
-    return $tglFormatted . ', ' . substr($mulai, 0, 5) . ' - ' . substr($selesai, 0, 5) . ' WIB';
-}
+$agendas = getAllAgenda();
 ?>
 
-<h2>Daftar Agenda</h2>
-<a href="tambah.php">+ Tambah Agenda Baru</a><br><br>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Daftar Agenda</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            margin: 0;
+            font-family: sans-serif;
+        }
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: #f8f9fa;
+            padding-top: 20px;
+            position: fixed;
+        }
+        .sidebar a {
+            display: block;
+            padding: 10px 20px;
+            color: #333;
+            text-decoration: none;
+        }
+        .sidebar a:hover {
+            background-color: #e9ecef;
+        }
+        .sidebar .active {
+            font-weight: bold;
+            color: #0d6efd;
+        }
+        .content {
+            margin-left: 250px;
+            padding: 30px;
+            width: 100%;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        .btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .btn-edit {
+            background-color: #ffc107;
+            color: white;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-add {
+            background-color: #28a745;
+            color: white;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
 
-<?php if (isset($_GET['success'])): ?>
-  <p style="color:green;">Agenda berhasil ditambahkan!</p>
-<?php endif; ?>
+<?php include __DIR__ . '../../partials/sidebar.php'; ?>
 
-<table border="1" cellpadding="10" cellspacing="0">
-  <tr>
-    <th>Judul</th>
-    <th>Lokasi</th>
-    <th>Waktu</th>
-    <th>Aksi</th>
-  </tr>
-  <?php foreach ($agendas as $agenda): ?>
-    <tr>
-      <td><?= htmlspecialchars($agenda['nama_agenda']) ?></td>
-      <td><?= htmlspecialchars($agenda['lokasi']) ?></td>
-      <td><?= formatAgenda($agenda['tanggal'], $agenda['jam_mulai'], $agenda['jam_selesai']) ?></td>
-      <td>
-        <!-- Edit dan hapus bisa ditambahkan nanti -->
-        <a href="#">✏️ Edit</a> | <a href="#">🗑️ Hapus</a>
-      </td>
-    </tr>
-  <?php endforeach; ?>
-</table>
+<div class="content">
+    <h2>Daftar Agenda</h2>
 
+    <?php if (isset($_GET['success'])): ?>
+        <div class="alert alert-success">Agenda berhasil ditambahkan.</div>
+    <?php elseif (isset($_GET['updated'])): ?>
+        <div class="alert alert-success">Agenda berhasil diperbarui.</div>
+    <?php elseif (isset($_GET['deleted'])): ?>
+        <div class="alert alert-success">Agenda berhasil dihapus.</div>
+    <?php elseif (isset($_GET['error'])): ?>
+        <div class="alert alert-danger">Terjadi kesalahan. Coba lagi.</div>
+    <?php endif; ?>
+
+    <a href="tambah.php" class="btn btn-add">+ Tambah Agenda</a>
+
+    <?php if (count($agendas) > 0): ?>
+        <table>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama Agenda</th>
+                    <th>Tanggal & Waktu</th>
+                    <th>Lokasi</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($agendas as $i => $agenda): ?>
+                    <tr>
+                        <td><?= $i + 1 ?></td>
+                        <td><?= htmlspecialchars($agenda['nama_agenda']) ?></td>
+                        <td><?= formatTanggalIndonesia($agenda['tanggal'], $agenda['jam_mulai'], $agenda['jam_selesai']) ?></td>
+                        <td><?= htmlspecialchars($agenda['lokasi']) ?></td>
+                        <td>
+                            <a href="edit.php?id=<?= $agenda['id'] ?>" class="btn btn-edit">Edit</a>
+                            <a href="../../../controllers/agenda.php?hapus=<?= $agenda['id'] ?>" 
+                               onclick="return confirm('Yakin ingin menghapus agenda ini?')" 
+                               class="btn btn-delete">Hapus</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php else: ?>
+        <p><em>Tidak ada agenda yang tersedia.</em></p>
+    <?php endif; ?>
+</div>
+
+</body>
+</html>

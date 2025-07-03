@@ -16,6 +16,8 @@ if (!isset($_SESSION['admin_id'])) {
     <style>
         body {
             display: flex;
+            margin: 0;
+            font-family: sans-serif;
         }
         .sidebar {
             width: 250px;
@@ -33,36 +35,28 @@ if (!isset($_SESSION['admin_id'])) {
         .sidebar a:hover {
             background-color: #e9ecef;
         }
+        .sidebar .active {
+            font-weight: bold;
+            color: #0d6efd;
+        }
         .content {
             margin-left: 250px;
             padding: 30px;
             width: 100%;
         }
-        .sidebar .active {
-            font-weight: bold;
-            color: #0d6efd;
+        h2 {
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 16px;
+            color: #333;
         }
     </style>
 </head>
 <body>
 
 <!-- Sidebar -->
-<div class="sidebar border-end">
-    <h4 class="text-center mb-4">Admin Panel</h4>
-    <a href="dashboard.php"><i class="bi bi-house-door"></i> Dashboard</a>
-    <a href="../public/beranda.php"><i class="bi bi-house-door"></i> Beranda</a>
-    <hr>
-    <strong class="d-block px-3">Beranda</strong>
-    <a href="submenu/index.php"><i class="bi bi-list-task"></i> Submenu</a>
-    <a href="kategori/index.php"><i class="bi bi-tags"></i> Kategori</a>
-    <a href="statistik/index.php"><i class="bi bi-bar-chart-line"></i> Statistik</a>
-    <hr>
-    <a href="galeri/index.php"><i class="bi bi-images"></i> Galeri</a>
-    <a href="agenda/index.php"><i class="bi bi-calendar-event"></i> Agenda</a>
-    <a href="berita/index.php"><i class="bi bi-newspaper"></i> Berita</a>
-    <hr>
-    <a href="../logout.php" class="text-danger"><i class="bi bi-box-arrow-right"></i> Keluar</a>
-</div>
+<?php include __DIR__ . '/partials/sidebar.php'; ?>
 
 <!-- Main Content -->
 <div class="content">

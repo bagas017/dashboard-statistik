@@ -125,15 +125,8 @@ $agendas = getAllAgenda();
   </style>
 </head>
 <body>
-  <header>
-    <div class="logo">🟦 BAPPEDA <br> PROV LAMPUNG</div>
-    <div class="nav">
-        <a href="beranda.php">🏠 Beranda</a>
-        <a href="agenda.php" class="active">📅 Agenda</a>
-        <a href="berita.php">📰 Berita</a>
-        <a href="galeri.php">🖼️ Galeri</a>
-    </div>
-  </header>
+<?php include 'partials/header.php'; ?>
+
 
   <div class="container">
     <h2>Agenda Kegiatan</h2>
