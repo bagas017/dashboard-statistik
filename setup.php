@@ -124,6 +124,12 @@ try {
         $pdo->exec("ALTER TABLE kategori ADD COLUMN gambar VARCHAR(255)");
     }
     
+    // Tambahkan icon_class ke tabel submenu
+    $stmt = $pdo->query("SHOW COLUMNS FROM submenu LIKE 'icon_class'");
+    if ($stmt->rowCount() == 0) {
+        $pdo->exec("ALTER TABLE submenu ADD COLUMN icon_class VARCHAR(50) DEFAULT NULL");
+    }
+    
     echo "Seluruh tabel berhasil dibuat.";
 
 } catch (PDOException $e) {

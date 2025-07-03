@@ -20,6 +20,8 @@ foreach ($submenus as $sm) {
 <head>
     <title>Beranda</title>
     <script src="https://code.highcharts.com/highcharts.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
     <style>
         .submenu-nav a {
             margin-right: 10px;
@@ -54,27 +56,8 @@ foreach ($submenus as $sm) {
     </style>
 </head>
 <body>
-<a href="../admin/dashboard.php" style="
-    display: inline-block;
-    margin-bottom: 20px;
-    padding: 10px 15px;
-    background-color: blue;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-">← Admin Dashboard</a>
 
 <h1>Beranda</h1>
-
-<div class="submenu-nav">
-    <?php foreach ($submenus as $sm): ?>
-        <a href="?submenu=<?= $sm['slug'] ?>" class="<?= ($sm['slug'] === $slug ? 'active' : '') ?>">
-            <?= htmlspecialchars($sm['nama_submenu']) ?>
-        </a>
-    <?php endforeach; ?>
-</div>
-
-<hr>
 
 <?php if ($current): ?>
     <h2><?= htmlspecialchars($current['nama_submenu']) ?></h2>
@@ -282,5 +265,18 @@ foreach ($submenus as $sm) {
 <?php else: ?>
     <p>Tidak ada submenu yang ditemukan.</p>
 <?php endif; ?>
+
+<hr>
+
+<div class="submenu-nav">
+    <?php foreach ($submenus as $sm): ?>
+        <a href="?submenu=<?= $sm['slug'] ?>" class="<?= ($sm['slug'] === $slug ? 'active' : '') ?>">
+            <?php if (!empty($sm['icon_class'])): ?>
+                <i class="bi <?= htmlspecialchars($sm['icon_class']) ?>" style="margin-right: 5px;"></i>
+            <?php endif; ?>
+            <?= htmlspecialchars($sm['nama_submenu']) ?>
+        </a>
+    <?php endforeach; ?>
+</div>
 </body>
 </html>
