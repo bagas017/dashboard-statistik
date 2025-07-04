@@ -20,7 +20,12 @@ if (!$berita) {
 </p>
 
 <h2><?= htmlspecialchars($berita['judul']) ?></h2>
-<p><small>Dipublikasikan oleh <strong>Administrator</strong> pada <?= date('d M Y', strtotime($berita['tanggal'])) ?></small></p>
+<p><small>
+    <strong><?= htmlspecialchars($berita['divisi']) ?></strong>
+    <br>
+    <?= date('d M Y, H:i', strtotime($berita['tanggal'])) ?>
+</small></p>
+
 
 <img src="../../uploads/berita/<?= $berita['gambar'] ?>"
      style="width:100%; height:auto; border-radius:5px;">

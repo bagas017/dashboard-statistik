@@ -1,11 +1,13 @@
 <?php
 require_once '../../config/database.php';
+require_once '../../controllers/carousel.php';
 
 $stmt = $pdo->prepare("SELECT * FROM submenu WHERE nama_menu = 'beranda'");
 $stmt->execute();
 $submenus = $stmt->fetchAll();
 
-$slug = $_GET['submenu'] ?? ($submenus[0]['slug'] ?? null);
+// Perbaikan di sini: tidak langsung memilih submenu pertama
+$slug = $_GET['submenu'] ?? null;
 
 $current = null;
 foreach ($submenus as $sm) {
@@ -24,6 +26,7 @@ foreach ($submenus as $sm) {
     <title>Beranda</title>
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
         html, body {
@@ -267,21 +270,38 @@ foreach ($submenus as $sm) {
                     div.style.display = (div.dataset.judul === selectedJudul) ? 'block' : 'none';
                 });
             });
-
-            document.addEventListener("DOMContentLoaded", function () {
-                const selector = document.getElementById('statistikSelector');
-                const selected = selector.value;
-                document.querySelectorAll('.statistik-container').forEach(div => {
-                    div.style.display = (div.dataset.judul === selected) ? 'block' : 'none';
-                });
-            });
             </script>
         <?php else: ?>
             <p><em>Tidak ada data statistik yang tersedia pada submenu ini.</em></p>
         <?php endif; ?>
     <?php endif; ?>
 <?php else: ?>
-    <p>Tidak ada submenu yang ditemukan.</p>
+    <?php
+    $carouselList = getAllCarousel();
+    ?>
+
+    <?php if (count($carouselList) > 0): ?>
+        <div id="carouselBeranda" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="2000">
+            <div class="carousel-inner">
+                <?php foreach ($carouselList as $i => $c): ?>
+                    <div class="carousel-item <?= $i === 0 ? 'active' : '' ?>">
+                        <img src="../../uploads/carousel/<?= htmlspecialchars($c['gambar']) ?>"
+                             class="d-block w-100"
+                             alt="Carousel <?= $i + 1 ?>"
+                             style="height: 600px; object-fit: cover;">
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselBeranda" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselBeranda" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+        </div>
+    <?php else: ?>
+        <p>Pilih submenu untuk melihat content</p>
+    <?php endif; ?>
 <?php endif; ?>
 </div>
 
@@ -297,5 +317,21 @@ foreach ($submenus as $sm) {
         </a>
     <?php endforeach; ?>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const carouselEl = document.querySelector('#carouselBeranda');
+    if (carouselEl) {
+        const carousel = new bootstrap.Carousel(carouselEl, {
+            interval: 10000,
+            ride: 'carousel',
+            pause: false, // ⬅️ penting: jangan berhenti meskipun mouse hover
+            wrap: true
+        });
+    }
+});
+</script>
+
 </body>
 </html>

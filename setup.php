@@ -90,6 +90,14 @@ try {
             jam_selesai TIME,
             lokasi VARCHAR(100)
         );
+
+        CREATE TABLE carousel (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            gambar VARCHAR(255) NOT NULL,
+            urutan INT NOT NULL,
+            status ENUM('aktif', 'nonaktif') DEFAULT 'aktif',
+            judul VARCHAR(200) DEFAULT NULL
+        );
     ");
     
     // Modifikasi struktur tabel statistik
@@ -128,6 +136,18 @@ try {
     $stmt = $pdo->query("SHOW COLUMNS FROM submenu LIKE 'icon_class'");
     if ($stmt->rowCount() == 0) {
         $pdo->exec("ALTER TABLE submenu ADD COLUMN icon_class VARCHAR(50) DEFAULT NULL");
+    }
+    
+    // Modifikasi tabel berita - tambah kolom divisi dan ubah tipe data tanggal
+    $stmt = $pdo->query("SHOW COLUMNS FROM berita LIKE 'divisi'");
+    if ($stmt->rowCount() == 0) {
+        $pdo->exec("ALTER TABLE berita ADD COLUMN divisi VARCHAR(100) AFTER judul");
+    }
+    
+    $stmt = $pdo->query("SHOW COLUMNS FROM berita LIKE 'tanggal'");
+    $columnInfo = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($columnInfo && strtoupper($columnInfo['Type']) !== 'DATETIME') {
+        $pdo->exec("ALTER TABLE berita MODIFY COLUMN tanggal DATETIME");
     }
     
     echo "Seluruh tabel berhasil dibuat.";
