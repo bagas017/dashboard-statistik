@@ -14,17 +14,16 @@ function getBeritaById($id) {
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-function tambahBerita($judul, $isi, $gambar) {
+function tambahBerita($judul, $divisi, $tanggal, $isi, $gambar) {
     global $pdo;
-    $tanggal = date('Y-m-d');
-    $stmt = $pdo->prepare("INSERT INTO berita (judul, gambar, isi, tanggal) VALUES (?, ?, ?, ?)");
-    return $stmt->execute([$judul, $gambar, $isi, $tanggal]);
+    $stmt = $pdo->prepare("INSERT INTO berita (judul, divisi, tanggal, isi, gambar) VALUES (?, ?, ?, ?, ?)");
+    return $stmt->execute([$judul, $divisi, $tanggal, $isi, $gambar]);
 }
 
-function updateBerita($id, $judul, $isi, $gambar) {
+function updateBerita($id, $judul, $divisi, $tanggal, $isi, $gambar) {
     global $pdo;
-    $stmt = $pdo->prepare("UPDATE berita SET judul = ?, isi = ?, gambar = ? WHERE id = ?");
-    return $stmt->execute([$judul, $isi, $gambar, $id]);
+    $stmt = $pdo->prepare("UPDATE berita SET judul = ?, divisi = ?, tanggal = ?, isi = ?, gambar = ? WHERE id = ?");
+    return $stmt->execute([$judul, $divisi, $tanggal, $isi, $gambar, $id]);
 }
 
 function hapusBerita($id) {

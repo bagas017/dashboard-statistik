@@ -130,6 +130,18 @@ try {
         $pdo->exec("ALTER TABLE submenu ADD COLUMN icon_class VARCHAR(50) DEFAULT NULL");
     }
     
+    // Modifikasi tabel berita - tambah kolom divisi dan ubah tipe data tanggal
+    $stmt = $pdo->query("SHOW COLUMNS FROM berita LIKE 'divisi'");
+    if ($stmt->rowCount() == 0) {
+        $pdo->exec("ALTER TABLE berita ADD COLUMN divisi VARCHAR(100) AFTER judul");
+    }
+    
+    $stmt = $pdo->query("SHOW COLUMNS FROM berita LIKE 'tanggal'");
+    $columnInfo = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($columnInfo && strtoupper($columnInfo['Type']) !== 'DATETIME') {
+        $pdo->exec("ALTER TABLE berita MODIFY COLUMN tanggal DATETIME");
+    }
+    
     echo "Seluruh tabel berhasil dibuat.";
 
 } catch (PDOException $e) {
