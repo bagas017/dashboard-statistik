@@ -90,6 +90,14 @@ try {
             jam_selesai TIME,
             lokasi VARCHAR(100)
         );
+
+        CREATE TABLE carousel (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            gambar VARCHAR(255) NOT NULL,
+            urutan INT NOT NULL,
+            status ENUM('aktif', 'nonaktif') DEFAULT 'aktif',
+            judul VARCHAR(200) DEFAULT NULL
+        );
     ");
     
     // Modifikasi struktur tabel statistik
