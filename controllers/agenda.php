@@ -43,6 +43,20 @@ function updateAgenda($id, $data) {
     ]);
 }
 
+function hariIndonesia($tanggal) {
+  $hariInggris = date('l', strtotime($tanggal));
+  $daftarHari = [
+    'Sunday' => 'Minggu',
+    'Monday' => 'Senin',
+    'Tuesday' => 'Selasa',
+    'Wednesday' => 'Rabu',
+    'Thursday' => 'Kamis',
+    'Friday' => 'Jumat',
+    'Saturday' => 'Sabtu',
+  ];
+  return $daftarHari[$hariInggris] ?? $hariInggris;
+}
+
 // Hapus agenda berdasarkan ID
 function hapusAgenda($id) {
     global $pdo;

@@ -8,138 +8,143 @@ $agendas = getAllAgenda();
 <head>
   <meta charset="UTF-8" />
   <title>Agenda - Bappeda Prov Lampung</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- CSS eksternal -->
+  <link rel="stylesheet" href="../../assets/css/public-agenda.css">
+
+  <!-- Gaya tambahan -->
   <style>
     body {
-      font-family: sans-serif;
-      background-color: #f1f1f1;
       margin: 0;
-      padding: 0;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      padding: 1rem 2rem;
-      background-color: white;
-      border-bottom: 1px solid #ccc;
+      font-family: 'Inter', sans-serif;
+      background-color: #f1f1f1;
     }
 
     .logo {
+      display: flex;
+      align-items: center;
       font-weight: bold;
-      margin-right: auto;
+      gap: 10px;
     }
 
-
-    .nav a {
-        padding: 0.5rem 1rem;
-        background-color: #e2e2e2;
-        border-radius: 6px;
-        font-weight: bold;
-        text-decoration: none;
-        color: #000;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background-color: #ccc;
+      display: inline-block;
     }
-
-    .nav a.active {
-        background-color: #666;
-        color: white;
-    }
-
 
     .nav {
       display: flex;
-      gap: 1rem;
-    }
-
-    .nav button {
-      padding: 0.5rem 1rem;
-      background-color: #e2e2e2;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
       gap: 0.5rem;
     }
 
-    .nav .active {
-      background-color: #666;
+    .nav a {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      font-weight: 600;
+      background-color: #5b4bad;
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+    }
+
+    .nav a.active {
+      background-color: #5b4bad;
       color: white;
     }
 
-    .container {
+    .main {
       padding: 2rem;
     }
 
     .back {
-      font-weight: bold;
-      margin-bottom: 1rem;
-      display: inline-block;
+      display: flex;
+      align-items: center;
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
     }
 
-    h2 {
+    .back::before {
+      content: "←";
+      margin-right: 0.5rem;
+    }
+
+    h4 {
+      font-size: 2rem;
       margin-bottom: 1.5rem;
     }
 
     .agenda-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 1rem;
+      gap: 1.5rem;
     }
 
     .card {
-      background-color: white;
-      border-radius: 10px;
+      background-color: #fec76f !important;
       padding: 1rem;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .day {
+      font-weight: 600;
+      color: #555;
     }
 
     .card h4 {
-      margin: 0.25rem 0;
-    }
-
-    .card p {
-      margin: 0.25rem 0;
-      font-size: 14px;
-      color: #444;
-    }
-
-    .icon {
-      margin-right: 0.3rem;
+      margin: 0.2rem 0;
+      font-size: 1.2rem;
+      font-weight: 700;
     }
 
     .info {
       display: flex;
       align-items: center;
       font-size: 14px;
-      margin-bottom: 0.3rem;
+      font-weight: 600;
+      color: #444;
+      margin-top: 0.2rem;
+      margin-bottom: 0.2rem;
     }
 
-    .day {
-      color: #888;
-      font-weight: bold;
+    .info-tanggal {
+      font-size: 0.875rem;
+      font-weight: 300;
     }
-
   </style>
 </head>
 <body>
+
 <?php include 'partials/header.php'; ?>
 
+<div class="main">
+  <div class="back">AGENDA</div>
 
-  <div class="container">
-    <h2>Agenda Kegiatan</h2>
-    <div class="agenda-grid">
-      <?php foreach ($agendas as $agenda): ?>
-        <div class="card">
-          <div class="day"><?= date('l', strtotime($agenda['tanggal'])) ?></div>
-          <h4><?= htmlspecialchars($agenda['nama_agenda']) ?></h4>
-          <div class="info">📍 <?= htmlspecialchars($agenda['lokasi']) ?></div>
-          <div class="info">📅 <?= formatTanggalIndonesia($agenda['tanggal'], $agenda['jam_mulai'], $agenda['jam_selesai']) ?></div>
-        </div>
-      <?php endforeach; ?>
-    </div>
+  <div class="agenda-grid">
+    <?php foreach ($agendas as $agenda): ?>
+      <div class="card">
+        <div class="day"><?= hariIndonesia($agenda['tanggal']) ?></div>
+        <h4><?= htmlspecialchars($agenda['nama_agenda']) ?></h4>
+        <div class="info">📍 <?= htmlspecialchars($agenda['lokasi']) ?></div>
+        <div class="info-tanggal">📅 <?= formatTanggalIndonesia($agenda['tanggal'], $agenda['jam_mulai'], $agenda['jam_selesai']) ?></div>
+      </div>
+    <?php endforeach; ?>
   </div>
+</div>
+
 </body>
 </html>
