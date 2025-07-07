@@ -5,11 +5,16 @@ $berita = $pdo->query("SELECT * FROM berita ORDER BY tanggal DESC")->fetchAll();
 
 function waktuRelatif($tanggalJam) {
     $detik = time() - strtotime($tanggalJam);
-    if ($detik < 60) return "$detik detik yang lalu";
-    elseif ($detik < 3600) return floor($detik / 60) . " menit yang lalu";
-    elseif ($detik < 86400) return floor($detik / 3600) . " jam yang lalu";
-    else return floor($detik / 86400) . " hari yang lalu";
+
+    if ($detik < 3600) {
+        return "1 jam yang lalu";
+    } elseif ($detik < 86400) {
+        return floor($detik / 3600) . " jam yang lalu";
+    } else {
+        return floor($detik / 86400) . " hari yang lalu";
+    }
 }
+
 ?>
 
 <?php include 'partials/header.php'; ?>
