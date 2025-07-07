@@ -28,58 +28,168 @@ foreach ($submenus as $sm) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f0f2f5;
+    }
 
-        .submenu-nav a {
-            margin-right: 10px;
-            text-decoration: none;
-            color: #333;
-        }
-        .submenu-nav a.active {
-            font-weight: bold;
-            color: darkblue;
-        }
+    /* Carousel */
+    .carousel {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* Wrapper utama */
+    .content-wrapper {
+        padding: 20px;
+        background-color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        margin: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        overflow-x: hidden;
+    }
+
+    /* Submenu horizontal scroll */
+    .submenu-nav {
+        display: flex;
+        overflow-x: auto;
+        padding: 10px 20px;
+        gap: 15px;
+        background-color: #fff;
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+        margin-top: 20px;
+        scroll-behavior: smooth;
+    }
+
+    .submenu-nav::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .submenu-nav::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
+    }
+
+    .submenu-nav a {
+        flex: 0 0 auto;
+        padding: 10px 20px;
+        background: #e9ecef;
+        color: #333;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: background 0.2s, color 0.2s;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+    }
+
+    .submenu-nav a i {
+        margin-right: 8px;
+    }
+
+    .submenu-nav a.active {
+        background-color: #343a40;
+        color: white;
+        font-weight: bold;
+    }
+
+    .submenu-nav a:hover {
+        background-color: #ced4da;
+        color: #000;
+    }
+
+    /* Kategori Box */
+    .kategori-box {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        padding: 10px;
+        width: 220px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: all 0.3s;
+    }
+
+    .kategori-box:hover {
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        transform: translateY(-2px);
+    }
+
+    .kategori-box h3 {
+        font-size: 1.1rem;
+        margin-top: 10px;
+    }
+
+    .kategori-box p {
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    .kategori-box a {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 6px 12px;
+        background-color: #007bff;
+        color: white;
+        border-radius: 4px;
+        text-decoration: none;
+    }
+
+    .kategori-box a:hover {
+        background-color: #0056b3;
+    }
+
+    /* Statistik */
+    select#statistikSelector {
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        margin: 10px 0 20px;
+        background: #fff;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        background-color: white;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    th, td {
+        border: 1px solid #dee2e6;
+        padding: 10px;
+        font-size: 0.95rem;
+    }
+
+    th {
+        background-color: #f1f3f5;
+    }
+
+    .statistik-container h3 {
+        font-size: 1.25rem;
+        margin-top: 20px;
+    }
+
+    .statistik-container h4 {
+        font-size: 1rem;
+        margin-top: 10px;
+        font-weight: 500;
+    }
+
+    @media screen and (max-width: 768px) {
         .kategori-box {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-            width: 200px;
+            width: 100%;
         }
-        table {
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        table, th, td {
-            border: 1px solid #888;
-        }
-        th, td {
-            padding: 5px 10px;
-            text-align: center;
-        }
-        .statistik-container {
-            display: none;
-            margin-top: 20px;
-        }
+    }
+</style>
 
-        .content-wrapper {
-            min-height: 80vh;
-            max-height: 80vh;
-            padding: 20px;
-            background-color: #f9f9f9;
-            overflow-y: auto;
-            box-sizing: border-box;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            overflow-x: scroll;
-        }
-    </style>
-</head>
 <body>
 
 <div class="content-wrapper">
