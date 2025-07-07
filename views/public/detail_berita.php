@@ -97,6 +97,7 @@ if (!$berita) {
         .news-content {
             font-size: 16px;
             line-height: 1.8;
+            text-align: justify; /* Ini bagian yang ditambahkan */
         }
 
         .news-content p {
@@ -108,7 +109,7 @@ if (!$berita) {
             .news-detail-container {
                 padding: 20px;
             }
-            
+
             .news-title {
                 font-size: 24px;
             }
