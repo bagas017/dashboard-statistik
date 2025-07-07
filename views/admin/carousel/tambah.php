@@ -13,7 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $urutan = $_POST['urutan'];
     $gambar = '';
 
-    // Cek apakah urutan sudah dipakai
     $carousel = getAllCarousel();
     foreach ($carousel as $c) {
         if ($c['urutan'] == $urutan) {
@@ -37,36 +36,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <title>Tambah Carousel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+    </style>
 </head>
-<body class="p-4">
-    <div class="container">
-        <h2>Tambah Gambar Carousel</h2>
+<body>
 
-        <?php if (!empty($error)): ?>
-            <div class="alert alert-danger"><?= $error ?></div>
-        <?php endif; ?>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Tambah Gambar Carousel</h2>
 
-        <form method="POST" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label for="gambar" class="form-label">Gambar Carousel:</label>
-                <input type="file" class="form-control" name="gambar" id="gambar" required>
-            </div>
+    <div class="card mx-auto" style="max-width: 600px;">
+        <div class="card-body">
+            <?php if (!empty($error)): ?>
+                <div class="alert alert-danger"><?= $error ?></div>
+            <?php endif; ?>
 
-            <div class="mb-3">
-                <label for="urutan" class="form-label">Urutan Tampil:</label>
-                <input type="number" class="form-control" name="urutan" id="urutan"
-                       min="1" value="<?= htmlspecialchars($_POST['urutan'] ?? 1) ?>" required>
-            </div>
+            <form method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="gambar" class="form-label">Pilih Gambar</label>
+                    <input type="file" class="form-control" name="gambar" id="gambar" required>
+                </div>
 
-            <button type="submit" class="btn btn-primary">Simpan</button>
-            <a href="index.php" class="btn btn-secondary">Kembali</a>
-        </form>
+                <div class="mb-3">
+                    <label for="urutan" class="form-label">Urutan Tampil</label>
+                    <input type="number" class="form-control" name="urutan" id="urutan" min="1"
+                           value="<?= htmlspecialchars($_POST['urutan'] ?? 1) ?>" required>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="index.php" class="btn btn-secondary">Kembali</a>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
     </div>
+</div>
+
 </body>
 </html>
-            

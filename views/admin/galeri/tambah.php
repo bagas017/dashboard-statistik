@@ -1,7 +1,8 @@
 <?php
+session_start();
 require_once '../../../config/database.php';
 
-// Fungsi untuk konversi URL YouTube menjadi embed
+// Konversi URL YouTube menjadi format embed
 function convertYoutubeToEmbed($url) {
     if (strpos($url, 'youtu.be/') !== false) {
         $id = explode('youtu.be/', $url)[1];
@@ -49,32 +50,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<h2>Tambah Galeri</h2>
-<form method="POST" enctype="multipart/form-data">
-    <label>Jenis:</label><br>
-    <select name="jenis" id="jenis" required onchange="toggleJenis()">
-        <option value="foto">Foto</option>
-        <option value="video">Video</option>
-    </select><br><br>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Tambah Galeri</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Tambah Galeri</h2>
 
-    <label>Judul:</label><br>
-    <input type="text" name="judul" required><br><br>
+    <div class="card shadow">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label">Jenis</label>
+                    <select name="jenis" id="jenis" class="form-select" required onchange="toggleJenis()">
+                        <option value="foto">Foto</option>
+                        <option value="video">Video</option>
+                    </select>
+                </div>
 
-    <label>Deskripsi:</label><br>
-    <textarea name="deskripsi" rows="3"></textarea><br><br>
+                <div class="mb-3">
+                    <label class="form-label">Judul</label>
+                    <input type="text" name="judul" class="form-control" required>
+                </div>
 
-    <div id="fileUpload">
-        <label>Upload File (Gambar/Video):</label><br>
-        <input type="file" name="file"><br><br>
+                <div class="mb-3">
+                    <label class="form-label">Deskripsi</label>
+                    <textarea name="deskripsi" rows="3" class="form-control"></textarea>
+                </div>
+
+                <div id="fileUpload" class="mb-3">
+                    <label class="form-label">Upload File (Gambar/Video)</label>
+                    <input type="file" name="file" class="form-control">
+                </div>
+
+                <div id="youtubeLink" class="mb-3" style="display:none;">
+                    <label class="form-label">Link Video YouTube</label>
+                    <input type="text" name="youtube_link" class="form-control" placeholder="Contoh: https://youtu.be/abc123 atau https://www.youtube.com/watch?v=abc123">
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <a href="index.php" class="btn btn-secondary">Kembali</a>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <div id="youtubeLink" style="display:none;">
-        <label>Link Video YouTube:</label><br>
-        <input type="text" name="youtube_link" placeholder="Contoh: https://youtu.be/abc123 atau https://www.youtube.com/watch?v=abc123"><br><br>
-    </div>
-
-    <button type="submit">Simpan</button>
-</form>
+</div>
 
 <script>
 function toggleJenis() {
@@ -91,3 +116,5 @@ function toggleJenis() {
     }
 }
 </script>
+</body>
+</html>
