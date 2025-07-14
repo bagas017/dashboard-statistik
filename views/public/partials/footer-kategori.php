@@ -115,11 +115,18 @@
     </style>
 </head>
 <body>
+    <?php
+    // Default ke beranda.php jika sedang di kategori.php
+    $currentPage = basename($_SERVER['PHP_SELF']);
+    $targetPage = ($currentPage === 'kategori.php') ? 'beranda.php' : $currentPage;
+    ?>
+
     <!-- Sticky Footer dengan PHP -->
     <div class="submenu-footer">
         <div class="submenu-nav-container">
             <?php foreach ($submenus as $sm): ?>
-                <a href="?submenu=<?= $sm['slug'] ?>" class="submenu-btn <?= ($sm['slug'] === $slug ? 'active' : '') ?>">
+                <a href="<?= $targetPage ?>?submenu=<?= urlencode($sm['slug']) ?>&id=<?= urlencode($sm['id']) ?>"
+                   class="submenu-btn <?= ($sm['slug'] === $slug ? 'active' : '') ?>">
                     <span><?= htmlspecialchars($sm['nama_submenu']) ?></span>
                     <?php if (!empty($sm['icon_class'])): ?>
                         <i class="bi <?= htmlspecialchars($sm['icon_class']) ?>"></i>

@@ -13,75 +13,232 @@ $submenus = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Submenu Beranda</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submenu Beranda - Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --danger-color: #f72585;
+            --warning-color: #f77f00;
+            --success-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --sidebar-width: 280px;
+        }
+        
         body {
-            display: flex;
-            margin: 0;
-            font-family: sans-serif;
-        }
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            background-color: #f8f9fa;
-            padding-top: 20px;
-            position: fixed;
-        }
-        .sidebar a {
-            display: block;
-            padding: 10px 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
             color: #333;
-            text-decoration: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
         }
-        .sidebar a:hover {
-            background-color: #e9ecef;
+        
+        /* Sidebar Styling */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 250px;
+            z-index: 1000;
+            background-color: #f8f9fa;
+            box-shadow: 1px 0 5px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
         }
-        .sidebar .active {
-            font-weight: bold;
-            color: #0d6efd;
-        }
+        
+        /* Main Content Styling */
         .content {
-            margin-left: 250px;
+            margin-left: var(--sidebar-width);
             padding: 30px;
-            width: 100%;
+            width: calc(100% - var(--sidebar-width));
+            transition: all 0.3s;
         }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-top: 15px;
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
         }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: left;
+        
+        .page-header h2 {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin: 0;
         }
-        .btn {
-            padding: 6px 10px;
-            border: none;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .btn-edit {
-            background-color: #ffc107;
-            color: white;
-        }
-        .btn-delete {
-            background-color: #dc3545;
-            color: white;
-        }
+        
         .btn-add {
-            background-color: #28a745;
+            background-color: var(--primary-color);
             color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .btn-add:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-add i {
+            margin-right: 8px;
+        }
+        
+        /* Table Styling */
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .table thead th {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+            padding: 12px 15px;
+            border-bottom: 2px solid #e9ecef;
+            vertical-align: middle;
+        }
+        
+        .table tbody tr {
+            transition: all 0.2s;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+        
+        .table td {
+            padding: 12px 15px;
+            vertical-align: middle;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        /* Icon Styling */
+        .table-icon {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        /* Badge Styling */
+        .badge {
+            padding: 6px 10px;
+            font-weight: 500;
+            border-radius: 6px;
+        }
+        
+        .bg-info {
+            background-color: #d0ebff !important;
+            color: #1971c2 !important;
+        }
+        
+        /* Button Styling */
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            margin-right: 5px;
+        }
+        
+        .btn-edit {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-edit:hover {
+            background-color: #e67700;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 6px rgba(247, 127, 0, 0.3);
+        }
+        
+        .btn-delete {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background-color: #e51779;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 6px rgba(247, 37, 133, 0.3);
+        }
+        
+        .btn-action i {
+            margin-right: 5px;
+            font-size: 12px;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 60px;
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h4 {
+            font-weight: 500;
             margin-bottom: 10px;
-            display: inline-block;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+                overflow: hidden;
+            }
+            
+            .content {
+                margin-left: 0;
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -90,40 +247,70 @@ $submenus = $stmt->fetchAll();
 <?php include __DIR__ . '../../partials/sidebar.php'; ?>
 
 <div class="content">
-    <h2>Submenu Beranda</h2>
-    <a href="tambah.php" class="btn btn-add">+ Tambah Submenu</a>
+    <div class="page-header">
+        <h2><i class="bi bi-list-check me-2"></i>Submenu</h2>
+        <a href="tambah.php" class="btn btn-add">
+            <i class="bi bi-plus-circle"></i> Tambah Submenu
+        </a>
+    </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Icon</th>
-                <th>Nama Submenu</th>
-                <th>Slug</th>
-                <th>Tipe Tampilan</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (count($submenus) > 0): ?>
-                <?php foreach ($submenus as $i => $sm): ?>
-                    <tr>
-                        <td><?= $i + 1 ?></td>
-                        <td><i class="bi <?= $sm['icon_class'] ?? 'bi-question-circle' ?>" style="font-size: 1.5rem;"></i></td>
-                        <td><?= htmlspecialchars($sm['nama_submenu']) ?></td>
-                        <td><?= htmlspecialchars($sm['slug']) ?></td>
-                        <td><span class="badge bg-info text-dark"><?= $sm['tipe_tampilan'] ?></span></td>
-                        <td>
-                            <a href="edit.php?id=<?= $sm['id'] ?>" class="btn btn-edit">Edit</a>
-                            <a href="../../../controllers/submenu.php?hapus=<?= $sm['id'] ?>" class="btn btn-delete" onclick="return confirm('Yakin ingin menghapus submenu ini?')">Hapus</a>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr><td colspan="6" class="text-center">Belum ada submenu ditambahkan.</td></tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
+    <div class="card">
+        <div class="card-header">
+            Daftar Submenu Beranda
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th width="5%">No</th>
+                            <th width="10%">Icon</th>
+                            <th width="25%">Nama Submenu</th>
+                            <th width="25%">Slug</th>
+                            <th width="15%">Tipe Tampilan</th>
+                            <th width="20%">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (count($submenus) > 0): ?>
+                            <?php foreach ($submenus as $i => $sm): ?>
+                                <tr>
+                                    <td><?= $i + 1 ?></td>
+                                    <td><i class="bi <?= $sm['icon_class'] ?? 'bi-question-circle' ?> table-icon"></i></td>
+                                    <td><?= htmlspecialchars($sm['nama_submenu']) ?></td>
+                                    <td><?= htmlspecialchars($sm['slug']) ?></td>
+                                    <td><span class="badge bg-info"><?= $sm['tipe_tampilan'] ?></span></td>
+                                    <td>
+                                        <a href="edit.php?id=<?= $sm['id'] ?>" class="btn-action btn-edit">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </a>
+                                        <a href="../../../controllers/submenu.php?hapus=<?= $sm['id'] ?>" 
+                                           class="btn-action btn-delete" 
+                                           onclick="return confirm('Yakin ingin menghapus submenu ini?')">
+                                            <i class="bi bi-trash"></i> Hapus
+                                        </a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="6" class="text-center py-4">
+                                    <div class="empty-state">
+                                        <i class="bi bi-list"></i>
+                                        <h4>Belum Ada Submenu</h4>
+                                        <p>Silakan tambahkan submenu baru untuk mengisi daftar ini</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>

@@ -320,7 +320,7 @@ $galeri = $stmt->fetchAll();
            data-file="<?= $item['jenis'] === 'foto' ? '../../uploads/foto/'.$item['file_path'] : (strpos($item['file_path'], 'http') === 0 ? $item['file_path'] : '../../uploads/video/'.$item['file_path']) ?>"
            data-type="<?= $item['jenis'] ?>">
         
-        <button class="info-btn" onclick="event.stopPropagation(); showInfoModal(this.parentElement)">ℹ️</button>
+        <button class="info-btn" onclick="event.stopPropagation(); showInfoModal(this.parentElement)">i</button>
         
         <?php if ($item['jenis'] === 'foto'): ?>
           <img src="../../uploads/foto/<?= htmlspecialchars($item['file_path']) ?>" class="media ratio-<?= $ratio ?>" alt="<?= htmlspecialchars($item['judul']) ?>">
@@ -410,7 +410,7 @@ $galeri = $stmt->fetchAll();
     document.getElementById('infoModal').style.display = 'none';
     document.body.style.overflow = 'auto'; // Mengembalikan scroll
   }
-  
+
   // Tutup modal ketika klik di luar konten
   window.onclick = function(event) {
     const modal = document.getElementById('infoModal');
