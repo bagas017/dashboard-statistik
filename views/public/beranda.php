@@ -2,6 +2,50 @@
   require_once '../../config/database.php';
   require_once '../../controllers/carousel.php';
 
+  $jumlahBerita = 0;
+  $beritaTerakhir = null;
+  $jumlahAgenda = 0;
+  $agendaTerdekat = null;
+  
+  $jumlahBerita = $pdo->query("SELECT COUNT(*) FROM berita")->fetchColumn();
+  $beritaTerakhir = $pdo->query("SELECT judul, tanggal FROM berita ORDER BY tanggal DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+  
+  $jumlahAgenda = $pdo->query("SELECT COUNT(*) FROM agenda")->fetchColumn();
+  $agendaTerdekat = $pdo->query("
+    SELECT nama_agenda, tanggal, lokasi, jam_mulai, jam_selesai 
+    FROM agenda 
+    WHERE tanggal >= CURDATE() 
+    ORDER BY tanggal ASC 
+    LIMIT 1
+  ")->fetch(PDO::FETCH_ASSOC);
+
+  function hariIndonesia($tanggal) {
+      $hari = date('l', strtotime($tanggal));
+      $map = [
+          'Sunday' => 'Minggu',
+          'Monday' => 'Senin',
+          'Tuesday' => 'Selasa',
+          'Wednesday' => 'Rabu',
+          'Thursday' => 'Kamis',
+          'Friday' => 'Jumat',
+          'Saturday' => 'Sabtu',
+      ];
+      return $map[$hari] ?? $hari;
+  }
+
+  function formatTanggalIndonesia($tanggal, $jamMulai = null, $jamSelesai = null) {
+      $tgl = date('d M Y', strtotime($tanggal));
+      if ($jamMulai && $jamSelesai) {
+          return "$tgl | $jamMulai - $jamSelesai";
+      } elseif ($jamMulai) {
+          return "$tgl | $jamMulai";
+      }
+      return $tgl;
+  }
+
+
+
+
   $stmt = $pdo->prepare("SELECT * FROM submenu WHERE nama_menu = 'beranda'");
   $stmt->execute();
   $submenus = $stmt->fetchAll();
@@ -38,6 +82,21 @@
       flex-direction: column;
       justify-content: space-evenly;
       min-height: 100vh;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE 10+ */
+    }
+
+    body::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
+    }
+
+    * {
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE 10+ */
+    }
+
+    *::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
     }
 
     /* === LAYOUT UTAMA === */
@@ -58,14 +117,14 @@
 
     /* Tambahan styling jika berisi carousel (tanpa submenu) */
     .konten-carousel {
-      flex: 7;
+      flex: 8;
       background-color: #fff;
       padding: 20px;
       border-radius: 8px;
     }
 
     .side-content {
-      flex: 3;
+      flex: 2;
       background-color: #fff;
       padding: 20px;
       border-radius: 8px;
@@ -219,6 +278,39 @@
       background-color: #f0f0f0;
       font-weight: 600;
     }
+
+    .content-section h5 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 8px;
+    }
+
+    .content-item {
+      margin-bottom: 20px;
+    }
+
+    .content-item .title {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #555;
+      margin-bottom: 4px;
+    }
+
+    .side-content .day {
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 4px;
+    }
+
+    .side-content .info, .side-content .info-tanggal {
+      font-size: 0.85rem;
+      color: #444;
+      margin-bottom: 4px;
+    }
+
+
 
     /* === RESPONSIVE === */
     @media (max-width: 1200px) {
@@ -507,10 +599,35 @@
 
       <!-- === SIDE CONTENT (tampil hanya saat carousel) === -->
       <?php if (!$current): ?>
-      <div class="side-content">
-        <h5>Informasi Tambahan</h5>
-        <p>Contoh konten: info desa, pengumuman, agenda kegiatan, dsb.</p>
-      </div>
+        <div class="side-content">
+          <div class="content-section">
+            <h5><i class="bi bi-newspaper me-2"></i>Konten Terbaru</h5>
+
+            <div class="content-item mb-4">
+              <div class="title">Berita Terbaru</div>
+              <?php if ($beritaTerakhir): ?>
+                <div class="fw-bold"><?= htmlspecialchars($beritaTerakhir['judul']) ?></div>
+                <div class="date text-muted"><?= date('d M Y', strtotime($beritaTerakhir['tanggal'])) ?></div>
+              <?php else: ?>
+                <div class="text-muted">Belum ada berita</div>
+              <?php endif; ?>
+            </div>
+
+            <div class="content-item">
+              <div class="title">Agenda Terdekat</div>
+              <?php if ($agendaTerdekat): ?>
+                <div class="day fw-semibold"><?= hariIndonesia($agendaTerdekat['tanggal']) ?></div>
+                <h4 style="font-size: 1rem; margin-bottom: 6px;"><?= htmlspecialchars($agendaTerdekat['nama_agenda']) ?></h4>
+                <div class="info">📍 <?= htmlspecialchars($agendaTerdekat['lokasi']) ?></div>
+                <div class="info-tanggal">📅 <?= formatTanggalIndonesia($agendaTerdekat['tanggal'], $agendaTerdekat['jam_mulai'], $agendaTerdekat['jam_selesai']) ?></div>
+              <?php else: ?>
+                <div class="text-muted">Belum ada agenda mendatang</div>
+              <?php endif; ?>
+            </div>
+          </div>
+        </div>
+
+
       <?php endif; ?>
     </div>
 
