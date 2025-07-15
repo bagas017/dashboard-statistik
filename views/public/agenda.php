@@ -9,6 +9,9 @@ $agendas = getAllAgenda();
   <meta charset="UTF-8" />
   <title>Agenda - Bappeda Prov Lampung</title>
 
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,38 +42,16 @@ $agendas = getAllAgenda();
       display: inline-block;
     }
 
-    .nav {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .nav a {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      text-decoration: none;
-      font-weight: 600;
-      background-color: #5b4bad;
-      color: white;
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
-    }
-
-    .nav a.active {
-      background-color: #5b4bad;
-      color: white;
-    }
-
     .main {
-      padding: 2rem;
+      padding: 1.5rem;
     }
 
     .back {
       display: flex;
       align-items: center;
       font-weight: 600;
-      font-size: 1.2rem;
-      margin-bottom: 1.5rem;
+      font-size: 1.1rem;
+      margin-bottom: 1.2rem;
     }
 
     .back::before {
@@ -79,51 +60,88 @@ $agendas = getAllAgenda();
     }
 
     h4 {
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+      margin-bottom: 1.2rem;
     }
 
     .agenda-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+    }
+
+    @media (max-width: 900px) {
+      .agenda-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .agenda-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .card {
-      background-color: #fec76f !important;
       padding: 1rem;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
       transition: transform 0.2s ease;
+      border-radius: 6px !important;
+      border: none !important;
     }
 
     .card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-3px);
+    }
+
+    .card-1 {
+      background-color: #c1ecfc !important;
+    }
+
+    .card-2 {
+      background-color: #f8d7da !important;
+    }
+
+    .card-3 {
+      background-color: #d4edda !important;
     }
 
     .day {
       font-weight: 600;
       color: #555;
+      margin-bottom: 0.2rem;
+      font-size: 0.9rem;
     }
 
     .card h4 {
-      margin: 0.2rem 0;
-      font-size: 1.2rem;
-      font-weight: 700;
+      margin: 0.4rem 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #333;
     }
 
     .info {
       display: flex;
       align-items: center;
-      font-size: 14px;
+      font-size: 0.85rem;
       font-weight: 600;
       color: #444;
-      margin-top: 0.2rem;
-      margin-bottom: 0.2rem;
+      margin: 0.4rem 0;
+      gap: 0.4rem;
     }
 
     .info-tanggal {
-      font-size: 0.875rem;
-      font-weight: 300;
+      display: flex;
+      align-items: center;
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: #555;
+      gap: 0.4rem;
+      margin-top: 0.2rem;
+    }
+
+    .bi {
+      font-size: 0.9rem;
     }
   </style>
 </head>
@@ -135,12 +153,23 @@ $agendas = getAllAgenda();
   <div class="back">AGENDA</div>
 
   <div class="agenda-grid">
-    <?php foreach ($agendas as $agenda): ?>
-      <div class="card">
+    <?php 
+    $counter = 0;
+    foreach ($agendas as $agenda): 
+      $cardClass = 'card-' . (($counter % 3) + 1);
+      $counter++;
+    ?>
+      <div class="card <?php echo $cardClass; ?>">
         <div class="day"><?= hariIndonesia($agenda['tanggal']) ?></div>
         <h4><?= htmlspecialchars($agenda['nama_agenda']) ?></h4>
-        <div class="info">📍 <?= htmlspecialchars($agenda['lokasi']) ?></div>
-        <div class="info-tanggal">📅 <?= formatTanggalIndonesia($agenda['tanggal'], $agenda['jam_mulai'], $agenda['jam_selesai']) ?></div>
+        <div class="info">
+          <i class="bi bi-geo-alt-fill"></i>
+          <span><?= htmlspecialchars($agenda['lokasi']) ?></span>
+        </div>
+        <div class="info-tanggal">
+          <i class="bi bi-calendar-event"></i>
+          <span><?= formatTanggalIndonesia($agenda['tanggal'], $agenda['jam_mulai'], $agenda['jam_selesai']) ?></span>
+        </div>
       </div>
     <?php endforeach; ?>
   </div>
