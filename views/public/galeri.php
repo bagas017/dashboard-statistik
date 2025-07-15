@@ -44,23 +44,6 @@ $galeri = $stmt->fetchAll();
       margin-right: auto;
     }
 
-    .nav a {
-        padding: 0.5rem 1rem;
-        background-color: #e2e2e2;
-        border-radius: 6px;
-        font-weight: bold;
-        text-decoration: none;
-        color: #000;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .nav a.active {
-        background-color: #666;
-        color: white;
-    }
-
     .container {
       padding: 2rem;
       max-width: 1200px;
