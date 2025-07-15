@@ -9,50 +9,219 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <style>
-        header {
+        :root {
+            --beranda-color: #4361ee;
+            --beranda-hover: #3a56d4;
+            --agenda-color: #4cc9f0;
+            --agenda-hover: #3ab0d4;
+            --berita-color: #f72585;
+            --berita-hover: #d41a6f;
+            --galeri-color: #7209b7;
+            --galeri-hover: #5d0795;
+            --text-dark: #2b2d42;
+            --text-medium: #4a4e69;
+            --text-light: #8e9aaf;
+            --background-light: #f8f9fa;
+        }
+        
+        body {
             font-family: "Inter", sans-serif;
-            display: flex;
-            align-items: center;
-            padding: 1rem 2rem;
+            background-color: var(--background-light);
+        }
+        
+        .dashboard-header {
             background-color: white;
-            border-bottom: 1px solid #ccc;
-            }
-
-            .logo {
-            font-weight: 800;
-            font-size: 20px;
-            margin-right: auto;
-            }
-
-            .nav {
-            font-weight: 400;
-            display: flex;
-            gap: 0.5rem;
-            }
-
-            .nav a {
-            padding: 0.5rem 1rem;
-            background-color: #5b4bad;
-            border-radius: 6px;
-            font-weight: 600;
-            text-decoration: none;
-            color: white;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+            padding: 0.75rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .logo-container {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            text-decoration: none !important;
+        }
+        
+        .logo-svg {
+            width: 40px;
+            height: 40px;
+            margin-right: 12px;
+        }
+        
+        .logo-text {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+        
+        .nav-btn {
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 110px;
+            transition: all 0.3s ease;
+            text-decoration: none !important;
+        }
+        
+        /* Warna khusus untuk setiap tombol */
+        .btn-beranda {
+            background-color: var(--beranda-color);
+        }
+        .btn-beranda:hover {
+            background-color: var(--beranda-hover);
+            box-shadow: 0 4px 8px rgba(67, 97, 238, 0.2);
+        }
+        
+        .btn-agenda {
+            background-color: var(--agenda-color);
+        }
+        .btn-agenda:hover {
+            background-color: var(--agenda-hover);
+            box-shadow: 0 4px 8px rgba(76, 201, 240, 0.2);
+        }
+        
+        .btn-berita {
+            background-color: var(--berita-color);
+        }
+        .btn-berita:hover {
+            background-color: var(--berita-hover);
+            box-shadow: 0 4px 8px rgba(247, 37, 133, 0.2);
+        }
+        
+        .btn-galeri {
+            background-color: var(--galeri-color);
+        }
+        .btn-galeri:hover {
+            background-color: var(--galeri-hover);
+            box-shadow: 0 4px 8px rgba(114, 9, 183, 0.2);
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .nav-btn i {
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+        
+        .datetime-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin-left: 20px;
+        }
+        
+        .current-time {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .current-date {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+        
+        @media (max-width: 992px) {
+            .datetime-container {
+                display: none;
             }
+            
+            .nav-btn {
+                min-width: auto;
+                padding: 0.5rem 0.75rem;
+                font-size: 0.9rem;
+            }
+            
+            .nav-btn i {
+                margin-right: 5px;
+            }
+            
+            .logo-text {
+                font-size: 1.1rem;
+            }
+        }
     </style>
 </head>
 <body>
 
 <!-- HEADER -->
-<header>
-  <div class="logo">🟦 BAPPEDA PROV LAMPUNG</div>
-  <div class="nav">
-      <a href="beranda.php" class="nav-link">🏠 Beranda</a>
-      <a href="agenda.php" class="nav-link">📅 Agenda</a>
-      <a href="berita.php" class="nav-link">📰 Berita</a>
-      <a href="galeri.php" class="nav-link">🖼️ Galeri</a>
-  </div>
+<header class="dashboard-header">
+    <div class="container-fluid">
+        <div class="d-flex align-items-center justify-content-between">
+            <a href="#" class="logo-container text-decoration-none">
+                <!-- SVG Logo -->
+                <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="10" y="10" width="80" height="80" rx="15" fill="#4361ee"/>
+                    <path d="M30,30 L70,30 L70,50 L50,70 L30,50 Z" fill="white"/>
+                    <circle cx="50" cy="50" r="15" fill="#4361ee"/>
+                    <circle cx="50" cy="50" r="8" fill="white"/>
+                </svg>
+                <h1 class="logo-text">BAPPEDA PROV LAMPUNG</h1>
+            </a>
+            
+            <div class="d-flex align-items-center">
+                <div class="nav me-3">
+                    <a href="beranda.php" class="nav-btn btn-beranda me-2">
+                        <i class="bi bi-house-door"></i> Beranda
+                    </a>
+                    <a href="agenda.php" class="nav-btn btn-agenda me-2">
+                        <i class="bi bi-calendar-event"></i> Agenda
+                    </a>
+                    <a href="berita.php" class="nav-btn btn-berita me-2">
+                        <i class="bi bi-newspaper"></i> Berita
+                    </a>
+                    <a href="galeri.php" class="nav-btn btn-galeri">
+                        <i class="bi bi-images"></i> Galeri
+                    </a>
+                </div>
+                
+                <div class="datetime-container">
+                    <div class="current-time" id="current-time"></div>
+                    <div class="current-date" id="current-date"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </header>
 
+<script>
+    function updateDateTime() {
+        const now = new Date();
+        
+        // Format waktu HH:MM:SS
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        document.getElementById('current-time').textContent = `${hours}:${minutes}:${seconds}`;
+        
+        // Format tanggal Indonesia
+        const optionsDate = { 
+            weekday: 'long', 
+            day: 'numeric', 
+            month: 'long', 
+            year: 'numeric' 
+        };
+        document.getElementById('current-date').textContent = now.toLocaleDateString('id-ID', optionsDate);
+    }
+    
+    // Update setiap detik
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -14,7 +14,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            padding-bottom: 120px; /* Sesuaikan dengan tinggi footer */
+            padding-bottom: 6rem; /* Sesuaikan dengan tinggi footer */
         }
 
         .content {
