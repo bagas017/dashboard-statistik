@@ -187,7 +187,7 @@
 
     /* === CAROUSEL === */
     .carousel-inner img {
-      height: 620px;
+      height: 580px;
       object-fit: cover;
       border-radius: 10px;
     }
