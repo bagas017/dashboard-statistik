@@ -307,7 +307,7 @@ $submenus = $stmt->fetchAll();
                     <label class="form-label">Pilih Gambar</label>
                     <div class="gambar-selection">
                         <div class="row g-3">
-                            <?php for ($i = 1; $i <= 10; $i++): 
+                            <?php for ($i = 1; $i <= 15; $i++): 
                                 $gambar = "kategori$i.jpg"; ?>
                                 <div class="col-6 col-sm-4 col-md-3 col-lg-2">
                                     <label class="gambar-option d-block <?= $kategori['gambar'] == $gambar ? 'selected' : '' ?>">

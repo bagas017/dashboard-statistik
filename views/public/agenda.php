@@ -54,9 +54,19 @@ $agendas = getAllAgenda();
       margin-bottom: 1.2rem;
     }
 
-    .back::before {
-      content: "←";
-      margin-right: 0.5rem;
+    h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+
+    hr {
+      border: none;
+      height: 3px;
+      width: 60px;
+      background-color: #007bff;
+      margin-bottom: 1.5rem;
     }
 
     h4 {
@@ -95,15 +105,15 @@ $agendas = getAllAgenda();
     }
 
     .card-1 {
-      background-color: #c1ecfc !important;
+      background-color: #deeafcff !important; /* Biru muda lembut */
     }
 
     .card-2 {
-      background-color: #f8d7da !important;
+      background-color: #fff3cd !important; /* Kuning pastel hangat */
     }
 
     .card-3 {
-      background-color: #d4edda !important;
+      background-color: #e2f0cb !important; /* Hijau pastel segar */
     }
 
     .day {
@@ -150,7 +160,8 @@ $agendas = getAllAgenda();
 <?php include 'partials/header.php'; ?>
 
 <div class="main">
-  <div class="back">AGENDA</div>
+  <h2>AGENDA</h2>
+  <hr>
 
   <div class="agenda-grid">
     <?php 

@@ -45,7 +45,7 @@ $galeri = $stmt->fetchAll();
     }
 
     .container {
-      padding: 2rem;
+      padding: 1rem;
       max-width: 1200px;
       margin: 0 auto;
     }
@@ -55,25 +55,53 @@ $galeri = $stmt->fetchAll();
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1.5rem;
+      border-radius: 8px;
+      color: white;
     }
 
     .galeri-header h2 {
       margin: 0;
       font-size: 2rem;
-      color: #333;
+      color: black;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
     }
 
     .filter-form {
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      background-color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 30px;
+    }
+
+    .filter-form label {
+      font-weight: 600;
+      color: #0066cc;
     }
 
     .filter-form select {
-      padding: 0.5rem;
+      padding: 0.5rem 1rem;
       font-size: 1rem;
-      border-radius: 4px;
-      border: 1px solid #ccc;
+      border-radius: 20px;
+      border: 2px solid #0066cc;
+      background-color: white;
+      color: #333;
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .filter-form select:hover {
+      background-color: #f0f8ff;
+    }
+
+    .filter-form select:focus {
+      border-color: #004d99;
+      box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
     }
 
     .galeri-grid {
@@ -140,18 +168,26 @@ $galeri = $stmt->fetchAll();
     .show-more-btn {
       display: block;
       margin: 1rem auto;
-      padding: 0.5rem 1.5rem;
+      padding: 0.75rem 2rem;
       background-color: #0066cc;
       color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 30px;
       cursor: pointer;
       font-size: 1rem;
-      transition: background-color 0.2s;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 10px rgba(0, 102, 204, 0.3);
     }
 
     .show-more-btn:hover {
       background-color: #0052a3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 102, 204, 0.4);
+    }
+
+    .show-more-btn.hidden {
+      display: none;
     }
 
     /* Modal Popup */
@@ -321,8 +357,10 @@ $galeri = $stmt->fetchAll();
     <?php endforeach; ?>
   </div>
 
-  <?php if (count($galeri) > 0 && !$expanded): ?>
+  <?php if (count($galeri) > 8 && !$expanded): ?>
     <button class="show-more-btn" onclick="window.location.href='?jenis=<?= $filter ?>&expanded=1'">Tampilkan Lebih Banyak</button>
+  <?php else: ?>
+    <button class="show-more-btn hidden" onclick="window.location.href='?jenis=<?= $filter ?>&expanded=1'">Tampilkan Lebih Banyak</button>
   <?php endif; ?>
 
   <?php if (count($galeri) === 0): ?>

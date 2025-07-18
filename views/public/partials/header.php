@@ -32,7 +32,7 @@
         .dashboard-header {
             background-color: white;
             box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
-            padding: 0.75rem 2rem;
+            padding: 0.8rem 0.5rem;
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -56,6 +56,13 @@
             color: var(--text-dark);
             margin: 0;
             letter-spacing: -0.5px;
+        }
+        
+        .logo-subtext {
+            font-size: 0.85rem;
+            color: var(--text-medium);
+            margin: 0;
+            font-weight: 400;
         }
         
         .nav-btn {
@@ -115,19 +122,6 @@
             font-size: 1rem;
         }
         
-        .datetime-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            margin-left: 20px;
-        }
-        
-        .current-time {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-        
         .current-date {
             font-size: 0.85rem;
             color: var(--text-light);
@@ -162,14 +156,12 @@
     <div class="container-fluid">
         <div class="d-flex align-items-center justify-content-between">
             <a href="#" class="logo-container text-decoration-none">
-                <!-- SVG Logo -->
-                <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="10" y="10" width="80" height="80" rx="15" fill="#4361ee"/>
-                    <path d="M30,30 L70,30 L70,50 L50,70 L30,50 Z" fill="white"/>
-                    <circle cx="50" cy="50" r="15" fill="#4361ee"/>
-                    <circle cx="50" cy="50" r="8" fill="white"/>
-                </svg>
-                <h1 class="logo-text">BAPPEDA PROV LAMPUNG</h1>
+                <!-- Logo sebagai img -->
+                <img src="../../assets/img/logo.svg" alt="Logo BAPPEDA" class="logo-svg">
+                <div>
+                    <h1 class="logo-text">BAPPEDA PROV LAMPUNG</h1>
+                    <p class="logo-subtext">UPTD Pusat Data dan Informasi Pembangunan Daerah Provinsi Lampung</p>
+                </div>
             </a>
             
             <div class="d-flex align-items-center">
@@ -187,40 +179,10 @@
                         <i class="bi bi-images"></i> Galeri
                     </a>
                 </div>
-                
-                <div class="datetime-container">
-                    <div class="current-time" id="current-time"></div>
-                    <div class="current-date" id="current-date"></div>
-                </div>
             </div>
         </div>
     </div>
 </header>
-
-<script>
-    function updateDateTime() {
-        const now = new Date();
-        
-        // Format waktu HH:MM:SS
-        const hours = now.getHours().toString().padStart(2, '0');
-        const minutes = now.getMinutes().toString().padStart(2, '0');
-        const seconds = now.getSeconds().toString().padStart(2, '0');
-        document.getElementById('current-time').textContent = `${hours}:${minutes}:${seconds}`;
-        
-        // Format tanggal Indonesia
-        const optionsDate = { 
-            weekday: 'long', 
-            day: 'numeric', 
-            month: 'long', 
-            year: 'numeric' 
-        };
-        document.getElementById('current-date').textContent = now.toLocaleDateString('id-ID', optionsDate);
-    }
-    
-    // Update setiap detik
-    updateDateTime();
-    setInterval(updateDateTime, 1000);
-</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

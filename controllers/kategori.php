@@ -20,7 +20,7 @@ if (isset($_POST['tambah'])) {
     // Validasi panjang deskripsi (maks 25 kata)
     $kata = str_word_count(strip_tags($deskripsi));
     if ($kata > 25) {
-        $deskripsi = implode(' ', array_slice(explode(' ', $deskripsi), 0, 25));
+        $deskripsi = implode(' ', array_slice(explode(' ', $deskripsi), 0, 35));
     }
 
     $stmt = $pdo->prepare("INSERT INTO kategori (submenu_id, nama_kategori, deskripsi, gambar) VALUES (?, ?, ?, ?)");
@@ -41,7 +41,7 @@ if (isset($_POST['update'])) {
     // Validasi panjang deskripsi (maks 25 kata)
     $kata = str_word_count(strip_tags($deskripsi));
     if ($kata > 25) {
-        $deskripsi = implode(' ', array_slice(explode(' ', $deskripsi), 0, 25));
+        $deskripsi = implode(' ', array_slice(explode(' ', $deskripsi), 0, 35));
     }
 
     $stmt = $pdo->prepare("UPDATE kategori SET submenu_id = ?, nama_kategori = ?, deskripsi = ?, gambar = ? WHERE id = ?");
