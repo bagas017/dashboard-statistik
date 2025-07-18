@@ -242,8 +242,13 @@ foreach ($submenus as $sm) {
   }
 
   /* === CAROUSEL === */
+  .carousel-item {
+    height: 580px;
+    object-fit: cover;
+  }
+
   .carousel-inner img {
-    height: 580 px;
+    height: 580px;
     object-fit: cover;
     border-radius: 10px;
   }
