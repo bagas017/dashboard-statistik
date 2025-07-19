@@ -126,6 +126,7 @@ foreach ($submenus as $sm) {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    position: relative;
   }
 
   /* === HEADER === */
@@ -328,6 +329,16 @@ foreach ($submenus as $sm) {
     opacity: 0.9;
   }
 
+  /* === COPYRIGHT === */
+  .copyright-text {
+    position: absolute;
+    bottom: 10px;
+    left: 20px;
+    font-size: 0.6rem;
+    color: #666;
+    font-weight: 300;
+  }
+
   /* === RESPONSIVE === */
   @media (max-width: 1200px) {
     .kategori-container {
@@ -339,6 +350,11 @@ foreach ($submenus as $sm) {
     .side-content {
       max-width: 100%;
       margin-top: 20px;
+    }
+    .copyright-text {
+      position: static;
+      margin-top: 20px;
+      text-align: center;
     }
   }
 
@@ -604,7 +620,7 @@ foreach ($submenus as $sm) {
         <?php $carouselList = getAllCarousel(); ?>
 
         <?php if (count($carouselList) > 0): ?>
-          <div id="carouselBeranda" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="2000">
+          <div id="carouselBeranda" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="8000">
             <div class="carousel-inner">
               <?php foreach ($carouselList as $i => $c): ?>
                 <div class="carousel-item <?= $i === 0 ? 'active' : '' ?>">
@@ -657,6 +673,11 @@ foreach ($submenus as $sm) {
               <div class="text-muted">Belum ada agenda mendatang</div>
             <?php endif; ?>
           </div>
+        </div>
+
+        <!-- Copyright Text -->
+        <div class="copyright-text">
+          Dashboard Display Informasi UPTD Badan Perencanaan Pembangunan Daerah Provinsi Lampung @copyright 2025
         </div>
       </div>
 
