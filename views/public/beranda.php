@@ -246,12 +246,12 @@ foreach ($submenus as $sm) {
   /* === CAROUSEL === */
   .carousel-item {
     height: 580px;
-    object-fit: cover;
+    object-fit: fill;
   }
 
   .carousel-inner img {
     height: 580px;
-    object-fit: cover;
+    object-fit: fill;
     border-radius: 10px;
   }
 
@@ -637,7 +637,7 @@ foreach ($submenus as $sm) {
         <?php $carouselList = getAllCarousel(); ?>
 
         <?php if (count($carouselList) > 0): ?>
-          <div id="carouselBeranda" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="10000">
+          <div id="carouselBeranda" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="15000">
             <div class="carousel-inner">
               <?php foreach ($carouselList as $i => $c): ?>
                 <div class="carousel-item <?= $i === 0 ? 'active' : '' ?>">
