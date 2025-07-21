@@ -637,7 +637,7 @@ foreach ($submenus as $sm) {
         <?php $carouselList = getAllCarousel(); ?>
 
         <?php if (count($carouselList) > 0): ?>
-          <div id="carouselBeranda" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="8000">
+          <div id="carouselBeranda" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="10000">
             <div class="carousel-inner">
               <?php foreach ($carouselList as $i => $c): ?>
                 <div class="carousel-item <?= $i === 0 ? 'active' : '' ?>">
