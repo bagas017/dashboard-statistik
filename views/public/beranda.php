@@ -235,11 +235,12 @@ foreach ($submenus as $sm) {
   }
 
   #statistikSelector {
-    padding: 8px 10px;
+    padding: 8px 30px;
     border-radius: 4px;
     border: 1px solid #ccc;
     font-family: 'Inter', sans-serif;
-    max-width: 250px;
+    width: 100%;
+
   }
 
   /* === CAROUSEL === */
@@ -329,6 +330,14 @@ foreach ($submenus as $sm) {
     opacity: 0.9;
   }
 
+  .header-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
   /* === COPYRIGHT === */
   .copyright-text {
     position: absolute;
@@ -396,14 +405,37 @@ foreach ($submenus as $sm) {
   </style>
 </head>
 <body>
-  <div class="main-container">
+<div class="main-container">
     <!-- Kontainer Kiri -->
     <div class="content-container <?= $current ? '' : 'konten-carousel' ?>">
-      <div class="page-header">
-        <?php if ($current): ?>
+
+      <?php if ($current): ?>
+        <!-- Header Wrapper -->
+        <div class="header-wrapper">
           <h2><?= htmlspecialchars($current['nama_submenu']) ?></h2>
-        <?php endif; ?>
-      </div>
+
+          <?php if ($current['tipe_tampilan'] !== 'kategori'): ?>
+            <?php
+            $stmt = $pdo->prepare("SELECT * FROM statistik WHERE submenu_id = ?");
+            $stmt->execute([$current['id']]);
+            $stats = $stmt->fetchAll();
+            ?>
+            <?php if (count($stats) > 0): ?>
+              <?php
+              $judulList = array_unique(array_map(fn($s) => $s['judul'], $stats));
+              ?>
+              <div class="statistik-selector-container">
+                <select id="statistikSelector" class="form-select">
+                  <option value="" disabled selected>-- Pilih Statistik --</option>
+                  <?php foreach ($judulList as $judul): ?>
+                    <option value="<?= htmlspecialchars($judul) ?>"><?= htmlspecialchars($judul) ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+            <?php endif; ?>
+          <?php endif; ?>
+        </div>
+      <?php endif; ?>
 
       <?php if ($current): ?>
         <!-- === KATEGORI === -->
@@ -437,25 +469,8 @@ foreach ($submenus as $sm) {
 
         <!-- === STATISTIK === -->
         <?php else: ?>
-          <?php
-          $stmt = $pdo->prepare("SELECT * FROM statistik WHERE submenu_id = ?");
-          $stmt->execute([$current['id']]);
-          $stats = $stmt->fetchAll();
-          ?>
 
           <?php if (count($stats) > 0): ?>
-            <?php
-            $judulList = array_unique(array_map(fn($s) => $s['judul'], $stats));
-            ?>
-            <div class="statistik-selector-container">
-              <select id="statistikSelector" class="form-select">
-                <option value="" disabled selected>-- Pilih Statistik --</option>
-                <?php foreach ($judulList as $judul): ?>
-                  <option value="<?= htmlspecialchars($judul) ?>"><?= htmlspecialchars($judul) ?></option>
-                <?php endforeach; ?>
-              </select>
-            </div>
-
             <div class="statistik-wrapper">
               <?php foreach ($stats as $i => $stat): ?>
                 <?php
@@ -594,7 +609,7 @@ foreach ($submenus as $sm) {
             document.addEventListener('DOMContentLoaded', function() {
               const selector = document.getElementById('statistikSelector');
               const statContainers = document.querySelectorAll('.statistik-container');
-              if (selector.options.length > 1) {
+              if (selector && selector.options.length > 1) {
                 selector.selectedIndex = 1;
                 const firstJudul = selector.options[1].value;
                 statContainers.forEach(div => {
@@ -602,12 +617,14 @@ foreach ($submenus as $sm) {
                 });
               }
 
-              selector.addEventListener('change', function() {
-                const selectedJudul = this.value;
-                statContainers.forEach(div => {
-                  div.style.display = div.dataset.judul === selectedJudul ? 'block' : 'none';
+              if (selector) {
+                selector.addEventListener('change', function() {
+                  const selectedJudul = this.value;
+                  statContainers.forEach(div => {
+                    div.style.display = div.dataset.judul === selectedJudul ? 'block' : 'none';
+                  });
                 });
-              });
+              }
             });
             </script>
           <?php else: ?>
@@ -683,6 +700,7 @@ foreach ($submenus as $sm) {
 
     <?php endif; ?>
   </div>
+
 
   <?php include 'partials/footer.php'; ?>
 
