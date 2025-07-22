@@ -71,6 +71,16 @@ foreach ($submenus as $sm) {
 
   <style>
   /* Reset dan dasar */
+
+    :root {
+    --primary-color: #3498db;
+    --secondary-color: #2980b9;
+    --text-color: #333;
+    --light-gray: #f5f5f5;
+    --border-color: #ddd;
+    --shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
   body {
     margin: 0;
     font-family: 'Inter', sans-serif;
@@ -101,7 +111,6 @@ foreach ($submenus as $sm) {
     display: flex;
     flex-direction: row;
     flex: 1;
-    padding: 20px;
     gap: 20px;
   }
 
@@ -110,6 +119,7 @@ foreach ($submenus as $sm) {
     padding: 20px;
     background-color: #fafbffff;
     border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
 
   /* Tambahan styling jika berisi carousel (tanpa submenu) */
@@ -118,6 +128,7 @@ foreach ($submenus as $sm) {
     background-color: #fff;
     padding: 16px;
     border-radius: 8px;
+    margin: 1rem 0 1rem 1rem;
   }
 
   .side-content {
@@ -127,6 +138,7 @@ foreach ($submenus as $sm) {
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     position: relative;
+    margin: 1rem 1rem 1rem 0;
   }
 
   /* === HEADER === */
@@ -155,10 +167,11 @@ foreach ($submenus as $sm) {
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    height: 300px;
-    width: 350px;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    height: 300px;
   }
 
   .kategori-card:hover {
@@ -246,13 +259,16 @@ foreach ($submenus as $sm) {
   /* === CAROUSEL === */
   .carousel-item {
     height: 580px;
-    object-fit: cover;
+    object-fit: fill;
   }
 
   .carousel-inner img {
+    width: 100%;
+    max-width: 100%;
     height: 580px;
-    object-fit: cover;
+    object-fit: fill;
     border-radius: 10px;
+    display: block;
   }
 
   /* === TABEL === */
@@ -331,12 +347,25 @@ foreach ($submenus as $sm) {
   }
 
   .header-wrapper {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .header-wrapper h2 {
+    color: var(--primary-color);
+    margin: 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border-color);
+    flex-grow: 1;
+  }
+
+  .statistik-container h3, h4 {
+    color: var(--secondary-color);
+    margin-top: 16px;
+  }
 
   /* === COPYRIGHT === */
   .copyright-text {
@@ -346,6 +375,15 @@ foreach ($submenus as $sm) {
     font-size: 0.6rem;
     color: #666;
     font-weight: 300;
+  }
+
+  /* === CHART CONTAINER === */
+  .chart-container {
+    margin: 0;
+    background: white;
+    padding: 15px;
+    border-radius: 6px;
+    box-shadow: var(--shadow);
   }
 
   /* === RESPONSIVE === */
@@ -544,12 +582,14 @@ foreach ($submenus as $sm) {
                 ?>
 
                 <div class="statistik-container" id="<?= $containerId ?>" data-judul="<?= htmlspecialchars($stat['judul']) ?>" style="display: <?= $i === 0 ? 'block' : 'none' ?>;">
-                  <h3><?= htmlspecialchars($stat['judul']) ?></h3>
-                  <div id="<?= $chartId ?>" style="width:100%; height:400px;"></div>
+                  <div class="chart-container">
+                    <div id="<?= $chartId ?>" style="width:100%; height:400px;"></div>
+                  </div>
+                  <h4>Deskripsi</h4>
                   <p><?= nl2br(htmlspecialchars($stat['deskripsi'] ?? '')) ?></p>
 
                   <h4>Data Tabel</h4>
-                  <table class="table">
+                  <table>
                     <thead>
                       <tr>
                         <?php if ($chartType === 'pie'): ?>
