@@ -23,7 +23,6 @@ $galeri = $stmt->fetchAll();
   <meta charset="UTF-8" />
   <title>Galeri - Bappeda Prov Lampung</title>
   <style>
-    /* CSS Styles */
     body {
       font-family: sans-serif;
       background-color: #f1f1f1;
@@ -108,7 +107,7 @@ $galeri = $stmt->fetchAll();
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 1rem;
-      max-height: calc(4 * (250px + 1rem)); /* Maksimal 4 baris */
+      max-height: calc(4 * (250px + 1rem));
       overflow: hidden;
     }
 
@@ -190,7 +189,7 @@ $galeri = $stmt->fetchAll();
       display: none;
     }
 
-    /* Modal Popup */
+    /* Modal Styles */
     .modal {
       display: none;
       position: fixed;
@@ -204,7 +203,66 @@ $galeri = $stmt->fetchAll();
       justify-content: center;
     }
 
-    .modal-content {
+    /* Media Modal Specific Styles */
+    #mediaModal .modal-content {
+      background: transparent;
+      padding: 0;
+      width: auto;
+      max-width: 90vw;
+      max-height: 90vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #mediaModalContent {
+      position: relative;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    #mediaModal img {
+      max-height: 80vh;
+      max-width: 90vw;
+      width: auto;
+      height: auto;
+      display: block;
+    }
+
+    #mediaModal video {
+      max-height: 80vh;
+      max-width: 90vw;
+      width: auto;
+      height: auto;
+    }
+
+    #mediaModal iframe {
+      width: 80vw;
+      height: 45vw;
+      max-height: 80vh;
+      border: none;
+    }
+
+    #mediaModal .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: white;
+      background: rgba(0,0,0,0.5);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    /* Info Modal Styles */
+    #infoModal .modal-content {
       background-color: white;
       padding: 2rem;
       border-radius: 8px;
@@ -230,7 +288,7 @@ $galeri = $stmt->fetchAll();
       color: #333;
     }
 
-    .modal-close {
+    #infoModal .modal-close {
       background: none;
       border: none;
       font-size: 1.8rem;
@@ -239,17 +297,45 @@ $galeri = $stmt->fetchAll();
       padding: 0 0.5rem;
     }
 
-    .modal-close:hover {
+    #infoModal .modal-close:hover {
       color: #333;
     }
 
-    .modal-media {
-      width: 100%;
-      max-height: 500px;
-      object-fit: contain;
-      margin-bottom: 1.5rem;
-      border-radius: 4px;
-    }
+  .modal-media-container {
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Untuk video */
+  .modal-media-container.video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    height: 0;
+  }
+
+  /* Untuk foto */
+  .modal-media-container.image-container {
+    text-align: center;
+  }
+
+  .modal-media-container iframe,
+  .modal-media-container video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 4px;
+  }
+
+  .modal-media-container img {
+    max-height: 70vh;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    display: inline-block;
+  }
 
     .modal-date {
       color: #666;
@@ -261,6 +347,7 @@ $galeri = $stmt->fetchAll();
     .modal-description {
       line-height: 1.6;
       color: #444;
+      text-align: justify;  
     }
 
     .info-btn {
@@ -285,6 +372,27 @@ $galeri = $stmt->fetchAll();
       background: rgba(0,0,0,0.9);
     }
 
+    .video-thumbnail {
+      position: relative;
+    }
+
+    .video-thumbnail::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60px;
+      height: 60px;
+      background-color: rgba(255, 255, 255, 0.7);
+      border-radius: 50%;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%230066cc"><path d="M8 5v14l11-7z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 30px;
+      pointer-events: none;
+    }
+
     @media (max-width: 1200px) {
       .galeri-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -306,6 +414,19 @@ $galeri = $stmt->fetchAll();
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
+      }
+
+      #infoModal .modal-content {
+        padding: 1rem;
+      }
+
+      .modal-media-container {
+        padding-bottom: 75%;
+      }
+
+      #mediaModal iframe {
+        width: 90vw;
+        height: 50.625vw;
       }
     }
   </style>
@@ -330,9 +451,23 @@ $galeri = $stmt->fetchAll();
   <div class="galeri-grid <?= $expanded ? 'expanded' : '' ?>">
     <?php foreach ($galeri as $item): 
       $ratio = $item['rasio'] ?? '16-9';
+      $thumbnail_path = '';
+      if ($item['jenis'] === 'video') {
+        // If video is from external URL, try to get thumbnail (example for YouTube)
+        if (strpos($item['file_path'], 'youtube.com') !== false || strpos($item['file_path'], 'youtu.be') !== false) {
+          $video_id = '';
+          if (preg_match('%(?:youtube(?:nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $item['file_path'], $match)) {
+            $video_id = $match[1];
+          }
+          $thumbnail_path = $video_id ? 'https://img.youtube.com/vi/'.$video_id.'/hqdefault.jpg' : '';
+        } else {
+          // For local videos, use a generic video thumbnail or first frame (you might need to generate this)
+          $thumbnail_path = '../../assets/img/video-thumbnail.jpg'; // Replace with your generic video thumbnail
+        }
+      }
     ?>
       <div class="media-container" 
-           onclick="window.open('<?= $item['jenis'] === 'foto' ? '../../uploads/foto/'.$item['file_path'] : (strpos($item['file_path'], 'http') === 0 ? $item['file_path'] : '../../uploads/video/'.$item['file_path']) ?>', '_blank')"
+           onclick="showMediaModal(this)"
            data-title="<?= htmlspecialchars($item['judul']) ?>"
            data-date="<?= date('d F Y', strtotime($item['tanggal_upload'])) ?>"
            data-description="<?= htmlspecialchars($item['deskripsi']) ?>"
@@ -343,16 +478,13 @@ $galeri = $stmt->fetchAll();
         
         <?php if ($item['jenis'] === 'foto'): ?>
           <img src="../../uploads/foto/<?= htmlspecialchars($item['file_path']) ?>" class="media ratio-<?= $ratio ?>" alt="<?= htmlspecialchars($item['judul']) ?>">
-        <?php elseif (strpos($item['file_path'], 'http') === 0): ?>
-          <iframe src="<?= htmlspecialchars($item['file_path']) ?>" class="media ratio-<?= $ratio ?>" allowfullscreen></iframe>
         <?php else: ?>
-          <video class="media ratio-<?= $ratio ?>" controls>
-            <source src="../../uploads/video/<?= htmlspecialchars($item['file_path']) ?>">
-            Browser Anda tidak mendukung video.
-          </video>
+          <div class="video-thumbnail">
+            <img src="<?= $thumbnail_path ?>" class="media ratio-<?= $ratio ?>" alt="<?= htmlspecialchars($item['judul']) ?>">
+          </div>
         <?php endif; ?>
         
-        <p class="media-title"><?= htmlspecialchars($item['judul']) ?></p>
+        <p class="media-title"><?= mb_substr(strip_tags($item['judul']), 0, 75) ?>...</p>
       </div>
     <?php endforeach; ?>
   </div>
@@ -368,22 +500,84 @@ $galeri = $stmt->fetchAll();
   <?php endif; ?>
 </div>
 
-<!-- Modal Popup -->
+<!-- Media Modal Popup -->
+<div id="mediaModal" class="modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeMediaModal()">&times;</button>
+    <div id="mediaModalContent"></div>
+  </div>
+</div>
+
+<!-- Info Modal Popup -->
 <div id="infoModal" class="modal">
   <div class="modal-content">
     <div class="modal-header">
       <h3 class="modal-title" id="modalTitle"></h3>
       <button class="modal-close" onclick="closeModal()">&times;</button>
     </div>
-    <div id="modalMediaContainer">
-      <!-- Media akan dimasukkan di sini -->
-    </div>
+    <div id="modalMediaContainer"></div>
     <p class="modal-date" id="modalDate"></p>
     <p class="modal-description" id="modalDescription"></p>
   </div>
 </div>
 
 <script>
+  // Fungsi untuk menampilkan modal media
+  function showMediaModal(element) {
+    const file = element.getAttribute('data-file');
+    const type = element.getAttribute('data-type');
+    const title = element.getAttribute('data-title');
+    
+    const mediaContainer = document.getElementById('mediaModalContent');
+    mediaContainer.innerHTML = '';
+    
+    if (type === 'foto') {
+      const img = document.createElement('img');
+      img.src = file;
+      img.alt = title;
+      mediaContainer.appendChild(img);
+    } else if (type === 'video') {
+      if (file.startsWith('http')) {
+        const iframe = document.createElement('iframe');
+        iframe.src = file.includes('?') ? `${file}&autoplay=1` : `${file}?autoplay=1`;
+        iframe.allowFullscreen = true;
+        iframe.setAttribute('allow', 'autoplay');
+        iframe.setAttribute('title', title);
+        mediaContainer.appendChild(iframe);
+      } else {
+        const video = document.createElement('video');
+        video.controls = true;
+        video.autoplay = true;
+        video.setAttribute('title', title);
+        const source = document.createElement('source');
+        source.src = file;
+        video.appendChild(source);
+        mediaContainer.appendChild(video);
+      }
+    }
+    
+    document.getElementById('mediaModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  
+  function closeMediaModal() {
+    document.getElementById('mediaModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+    
+    // Stop video/iframe when modal is closed
+    const mediaContainer = document.getElementById('mediaModalContent');
+    const iframe = mediaContainer.querySelector('iframe');
+    const video = mediaContainer.querySelector('video');
+    
+    if (iframe) {
+      iframe.src = '';
+    }
+    if (video) {
+      video.pause();
+      video.currentTime = 0;
+    }
+  }
+
   // Fungsi untuk menampilkan modal info
   function showInfoModal(element) {
     const title = element.getAttribute('data-title');
@@ -399,43 +593,53 @@ $galeri = $stmt->fetchAll();
     const mediaContainer = document.getElementById('modalMediaContainer');
     mediaContainer.innerHTML = '';
     
+    const mediaWrapper = document.createElement('div');
+    
     if (type === 'foto') {
+      mediaWrapper.className = 'modal-media-container image-container';
       const img = document.createElement('img');
       img.src = file;
-      img.className = 'modal-media';
       img.alt = title;
-      mediaContainer.appendChild(img);
+      mediaWrapper.appendChild(img);
     } else if (type === 'video') {
+      mediaWrapper.className = 'modal-media-container video-container';
       if (file.startsWith('http')) {
         const iframe = document.createElement('iframe');
         iframe.src = file;
-        iframe.className = 'modal-media';
         iframe.allowFullscreen = true;
-        mediaContainer.appendChild(iframe);
+        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+        mediaWrapper.appendChild(iframe);
       } else {
         const video = document.createElement('video');
-        video.className = 'modal-media';
         video.controls = true;
+        video.setAttribute('playsinline', '');
         const source = document.createElement('source');
         source.src = file;
+        source.type = 'video/mp4';
         video.appendChild(source);
-        mediaContainer.appendChild(video);
+        mediaWrapper.appendChild(video);
       }
     }
     
+    mediaContainer.appendChild(mediaWrapper);
     document.getElementById('infoModal').style.display = 'flex';
-    document.body.style.overflow = 'hidden'; // Mencegah scroll di background
+    document.body.style.overflow = 'hidden';
   }
   
   function closeModal() {
     document.getElementById('infoModal').style.display = 'none';
-    document.body.style.overflow = 'auto'; // Mengembalikan scroll
+    document.body.style.overflow = 'auto';
   }
 
   // Tutup modal ketika klik di luar konten
   window.onclick = function(event) {
-    const modal = document.getElementById('infoModal');
-    if (event.target === modal) {  
+    const mediaModal = document.getElementById('mediaModal');
+    const infoModal = document.getElementById('infoModal');
+    
+    if (event.target === mediaModal) {  
+      closeMediaModal();
+    }
+    if (event.target === infoModal) {  
       closeModal();
     }
   }
@@ -443,6 +647,7 @@ $galeri = $stmt->fetchAll();
   // Tutup modal dengan tombol ESC
   document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
+      closeMediaModal();
       closeModal();
     }
   });
