@@ -85,6 +85,7 @@ if (!isset($slug)) {
             margin-top: 16px;
         }
         
+        
         /* === STATISTIK SELECTOR === */
         .statistik-selector-container {
             display: flex;
@@ -137,7 +138,7 @@ if (!isset($slug)) {
         }
         
         .chart-container {
-            margin: 30px 0;
+            margin: 0;
             background: white;
             padding: 15px;
             border-radius: 6px;
@@ -274,7 +275,6 @@ if (!isset($slug)) {
                 ?>
 
                 <div class="statistik-container" id="<?= $containerId ?>" data-judul="<?= htmlspecialchars($stat['judul']) ?>" style="<?= $i === 0 ? 'display:block;' : 'display:none;' ?>">
-                    <h3><?= htmlspecialchars($stat['judul']) ?></h3>
                     <div class="chart-container">
                         <div id="<?= $chartId ?>" style="width:100%; height:400px;"></div>
                     </div>
