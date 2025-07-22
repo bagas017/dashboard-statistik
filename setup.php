@@ -29,6 +29,12 @@ try {
     $stmt->execute(['admin', $hashedPassword]);
     echo "Admin default dibuat: admin / admin123<br>";
 
+    // Tambahkan admin real
+    $hashedPassword = password_hash("dashboardadminbappeda123", PASSWORD_DEFAULT);
+    $stmt = $pdo->prepare("INSERT INTO admin (username, password) VALUES (?, ?)");
+    $stmt->execute(['dashboardadmin', $hashedPassword]);
+    echo "Admin default dibuat: admin / dashboardadminbappeda123<br>";
+
     // Tambahan: buat tabel submenu, kategori, statistik, galeri, berita, agenda
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS submenu (
